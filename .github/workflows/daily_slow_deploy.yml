@@ -32,13 +32,16 @@ jobs:
           TOUR_API_KEY: ${{ secrets.TOUR_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_SHEET_CREDENTIALS: ${{ secrets.GOOGLE_SHEET_CREDENTIALS }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          USIMSA_AFFILIATE_URL: ${{ secrets.USIMSA_AFFILIATE_URL }}
+          KLOOK_AFFILIATE_URL: ${{ secrets.KLOOK_AFFILIATE_URL }}
         run: |
           python slow_wizztour_bot.py --build-once
 
-      - name: Commit and Push updated static files (triggers Cloudflare Pages deploy)
+      - name: Commit and Push updated static files (triggers Cloudflare deploy)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html posts/ sitemap.xml rss.xml robots.txt CNAME
+          git add index.html posts/ data/ sitemap.xml rss.xml robots.txt CNAME
           git diff --staged --quiet || (git commit -m "chore(slow): auto-update barrier-free travel guides & hotel comparisons" && git push)
-

@@ -51,6 +51,12 @@ SITE_BASE_URL = (os.environ.get("SITE_BASE_URL") or "https://slow.wizztour.com")
 SERVICE_KEY = os.environ.get("TOUR_API_KEY") or os.environ.get("PUBLIC_DATA_API_KEY") or ""
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
 GPT_API_KEY = os.environ.get("OPENAI_API_KEY") or ""
+SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID") or "1JErLxLYPvVufyxjvi6hnfbbQL7lyy4XEGLMrKZZb0x4"
+TRIPCOM_SHEET_NAME = "트립닷컴"
+
+# 세시간전(3hoursahead, AID: 121912) 유심/eSIM 및 액티비티 기본/환경변수 슬롯
+USIMSA_AFFILIATE_URL = os.environ.get("USIMSA_AFFILIATE_URL") or "https://www.usimsa.com/"
+KLOOK_AFFILIATE_URL = os.environ.get("KLOOK_AFFILIATE_URL") or "https://www.klook.com/ko/wifi-sim-card/"
 
 client = OpenAI(api_key=GPT_API_KEY) if (OpenAI and GPT_API_KEY) else None
 
@@ -65,6 +71,58 @@ os.makedirs(DATA_DIR, exist_ok=True)
 _WORKING_GEMINI_MODEL = None
 _WORKING_GPT_TERRA = None
 _WORKING_GPT_LUNA = None
+
+
+# ==============================================================================
+# 0. 구글 시트('트립닷컴' 탭) 세시간전 제휴 링크(호텔·관광지도·유심·투어) 자동 연동
+# ==============================================================================
+def load_region_affiliate_links() -> dict:
+    """
+    기존 wizztour.com / info.wizztour.com과 동일한 구글 시트('트립닷컴' 탭)에서
+    지역별 세시간전(3hoursahead) 트립닷컴/아고다/여기어때 제휴 링크 및 유심·투어 링크를 읽어옵니다.
+    """
+    result = {"hotel": {}, "map": {}, "usim": USIMSA_AFFILIATE_URL, "tour": KLOOK_AFFILIATE_URL}
+    cred_json = os.environ.get("GOOGLE_SHEET_CREDENTIALS")
+    if not cred_json:
+        return result
+    try:
+        import gspread
+        from oauth2client.service_account import ServiceAccountCredentials
+
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(cred_json), scope)
+        gc = gspread.authorize(creds)
+        ws = gc.open_by_key(SPREADSHEET_ID).worksheet(TRIPCOM_SHEET_NAME)
+        for row in ws.get_all_records():
+            region = str(row.get("지역") or "").strip()
+            if not region:
+                continue
+            h_url = str(row.get("트립링크") or row.get("트립닷컴") or row.get("호텔") or "").strip()
+            m_url = str(row.get("관광지도 주소") or row.get("관광지도") or row.get("주소") or "").strip()
+            u_url = str(row.get("유심링크") or row.get("유심") or row.get("eSIM") or "").strip()
+            t_url = str(row.get("투어링크") or row.get("클룩") or row.get("마이리얼트립") or "").strip()
+            if h_url:
+                result["hotel"][region] = h_url
+            if m_url:
+                result["map"][region] = m_url
+            if u_url:
+                result["usim"] = u_url
+            if t_url:
+                result["tour"] = t_url
+    except Exception as e:
+        print(f"[구글 시트 제휴링크 참고] {e}")
+    return result
+
+
+AFFILIATE_LINKS = load_region_affiliate_links()
+
+
+def resolve_hotel_affiliate_url(city: str, province: str = "") -> str:
+    h_map = AFFILIATE_LINKS.get("hotel") or {}
+    for key in (city, province):
+        if key and h_map.get(key):
+            return h_map[key]
+    return f"https://kr.trip.com/hotels/list?keyword={quote(city)}"
 
 
 # ==============================================================================
@@ -566,14 +624,14 @@ def make_slow_flat_route_html(title: str, city: str, flat_route: list) -> str:
 """.strip()
 
 
-def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_date_str: str) -> str:
+def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_date_str: str, province: str = "") -> str:
     """
-    [판매 상위 1%의 노하우 - STEP 3 & STEP 6 완벽 반영]
+    [판매 상위 1%의 노하우 - STEP 3 & STEP 6 완벽 반영 + 세시간전(3ha.in) 구글 시트 연동]
     - 확인 시점 명시 (YYYY년 MM월 DD일 확인 기준)
     - 비교 기준 명시 (장애인 전용 객실·엘리베이터·출입구 단차·1층 조식 동선·무료취소)
     - 3단 비교표 + 구체적 행동 유도('내 날짜 무장애·효도 객실 요금 예약하기')
     """
-    tripcom_url = f"https://kr.trip.com/hotels/list?keyword={quote(city)}"
+    tripcom_url = resolve_hotel_affiliate_url(city, province)
     tbody_rows = ""
     btn_colors = ["#0f766e", "#2563eb", "#ea580c"]
     btn_labels = ["장애인객실·특급호텔 요금 예약하기", "부모님·가족 리조트 조건 확인·예약", "무료취소 가능 가성비 호텔 예약하기"]
@@ -710,6 +768,39 @@ def generate_slow_persuasion_overview(dest: dict, check_date_str: str) -> str:
 """.strip()
 
 
+def make_usim_and_tour_affiliate_box_html(city: str) -> str:
+    """
+    [세시간전(3hoursahead, AID: 121912) 유심사(usimsa) eSIM/USIM & 클룩/마이리얼트립 투어패스 수익화 박스]
+    """
+    usim_url = AFFILIATE_LINKS.get("usim") or USIMSA_AFFILIATE_URL
+    tour_url = AFFILIATE_LINKS.get("tour") or KLOOK_AFFILIATE_URL
+    return f"""
+<section id="usim-and-tour-benefits" style="margin:26px 0; padding:20px; background:linear-gradient(135deg, #eef2ff 0%, #f0fdfa 100%); border:1px solid #c7d2fe; border-radius:16px;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+    <h3 style="margin:0; font-size:18px; color:#1e1b4b; font-weight:800;">
+      📶 여행 준비 필수 체크: 모바일 패스·투어 할인 &amp; 해외여행 eSIM/유심 특가
+    </h3>
+    <span style="background:#4f46e5; color:#fff; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px;">
+      트래킹 제휴 특가 혜택
+    </span>
+  </div>
+  <p style="margin:0 0 14px 0; font-size:13.8px; color:#334155; line-height:1.6;">
+    <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 줄을 서지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 사전 예매하시고, 다가오는 연휴 가족 해외여행을 준비 중이시라면 <strong>CU 편의점 즉시 픽업·QR 발급이 가능한 유심사(usimsa)·글로벌 eSIM</strong> 혜택을 함께 챙겨보세요.
+  </p>
+  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+    <a href="{escape(tour_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="flex:1; min-width:220px; text-align:center; background:#4f46e5; color:#ffffff !important; font-weight:800; font-size:13.8px; padding:11px 16px; border-radius:10px; text-decoration:none;">
+      🎟️ [{escape(city)}] 줄 서지 않는 모바일 입장권·액티비티 할인 예매하기
+    </a>
+    <a href="{escape(usim_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="flex:1; min-width:220px; text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:13.8px; padding:11px 16px; border-radius:10px; text-decoration:none;">
+      📱 가족 해외여행 준비 필수! 유심사(usimsa) eSIM·유심 최저가 발급받기
+    </a>
+  </div>
+</section>
+""".strip()
+
+
 # ==============================================================================
 # 4. 개별 상세 페이지 & 메인 포털 HTML 빌더
 # ==============================================================================
@@ -722,7 +813,7 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
     seo_title = f"[{year_str} {city}] {title} 휠체어·유모차·부모님 효도 평지 코스 & 무장애 호텔 비교 | WizzTour Slow"
     meta_desc = f"✅ 1분 요약 ({check_date_str} 확인 기준): {title} 장애인 주차장·경사로·휠체어/유모차 대여·화장실 12대 픽토그램 성적표, KTO 빅데이터 혼잡도 골든타임, 계단 없는 평지 산책 코스, 엘리베이터·장애인객실 호텔 비교 가이드."
     canonical = f"{SITE_BASE_URL}/posts/{slug}.html"
-    tripcom_url = f"https://kr.trip.com/hotels/list?keyword={quote(city)}"
+    tripcom_url = resolve_hotel_affiliate_url(city, province)
 
     # 실시간 KTO API 데이터 병합 시도
     live_bf = fetch_kto_barrier_free_detail(dest.get("contentid", ""))
@@ -735,7 +826,8 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
     crowd_food_html = make_crowd_and_food_care_box_html(dest)
     overview_html = generate_slow_persuasion_overview(dest, check_date_str)
     flat_route_html = make_slow_flat_route_html(title, city, dest.get("flat_route") or [])
-    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], check_date_str)
+    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], check_date_str, province=province)
+    usim_tour_html = make_usim_and_tour_affiliate_box_html(city)
 
     tags_html = "".join(
         f'<span style="background:#ccfbf1; color:#0f766e; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px;">#{escape(t)}</span>'
@@ -827,6 +919,9 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 
       <!-- [STEP 3 & STEP 6 - 2차 링크 배치: 무장애·효도 호텔 3단 비교표] -->
       {hotel_table_html}
+
+      <!-- 세시간전 유심사(usimsa) eSIM & 클룩/마이리얼트립 투어패스 제휴 박스 -->
+      {usim_tour_html}
 
       <!-- [STEP 6 - 3차 링크 배치: 마무리 추천 대상 정리 및 4대 WizzTour 생태계 허브] -->
       <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:18px 20px; margin-top:28px;">
@@ -1000,6 +1095,83 @@ def build_seo_assets(destinations: list):
         f.write("slow.wizztour.com\n")
 
 
+def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
+    """
+    [매일 1건 자동 신규 발행 엔진]
+    한국관광공사 KorService2(관광지 목록) + KorWithService1(무장애 상세정보)를 조회하여
+    아직 발행되지 않은 전국 열린관광지·무장애 명소 1곳을 자동으로 발굴·생성합니다.
+    """
+    if not SERVICE_KEY:
+        return {}
+    area_Url = "https://apis.data.go.kr/B551011/KorService2/areaBasedList2"
+    params = {
+        "serviceKey": unquote(SERVICE_KEY),
+        "numOfRows": 30,
+        "pageNo": random.randint(1, 5),
+        "MobileOS": "ETC",
+        "MobileApp": "WizzTourSlow",
+        "_type": "json",
+        "arrange": "Q",
+        "contentTypeId": "12",  # 관광지
+    }
+    try:
+        r = requests.get(area_Url, params=params, verify=False, timeout=8)
+        if r.status_code != 200:
+            return {}
+        items = (((r.json().get("response") or {}).get("body") or {}).get("items") or {}).get("item", [])
+        if isinstance(items, dict):
+            items = [items]
+        for it in (items or []):
+            cid = str(it.get("contentid") or "").strip()
+            title = str(it.get("title") or "").strip()
+            addr = str(it.get("addr1") or "").strip()
+            img = str(it.get("firstimage") or "").strip()
+            if not cid or cid in existing_ids or not title or not addr or not img:
+                continue
+            bf = fetch_kto_barrier_free_detail(cid)
+            # 무장애 항목이 최소 3개 이상 확인된 곳만 채택
+            valid_bf_cnt = sum(1 for k in ("parking", "route", "wheelchair", "restroom", "elevator", "stroller") if bf.get(k))
+            if valid_bf_cnt < 3:
+                continue
+            parts = addr.split()
+            province = parts[0][:2] if parts else "전국"
+            city = parts[1].rstrip("시군구") if len(parts) > 1 else province
+            slug = f"spot-{cid}-barrier-free"
+            return {
+                "contentid": cid,
+                "slug": slug,
+                "title": title,
+                "city": city,
+                "province": province,
+                "addr": addr,
+                "category_tags": ["휠체어추천", "부모님효도", "유모차산책", "열린관광지"],
+                "image": img.replace("http://", "https://"),
+                "overview": f"{title}은(는) 한국관광공사 무장애 여행정보(KorWithService1)에서 장애인 주차장·접근로·화장실 등 주요 보행 편의시설이 확인된 {city} 대표 나들이 명소입니다.",
+                "local_food": f"{city} 1층 평지 입식 향토 한정식 & 가족 식당",
+                "crowd_prediction": {
+                    "golden_time": "오전 09:30 ~ 11:30 (주차 및 관람 동선 여유)",
+                    "peak_time": "오후 14:00 ~ 16:30 (주말 방문객 집중 시간대)",
+                    "weekday_score": "쾌적",
+                    "weekend_tip": "오전 일찍 방문하시면 장애인 전용 주차구역 및 매표소 진입이 훨씬 수월합니다."
+                },
+                "barrier_free": bf,
+                "flat_route": [
+                    {"time": "오전 10:30", "place": f"{title} 장애인주차장 하차 → 무장애 주 관람로 산책", "note": "단차가 적은 주 출입구와 평지 동선 중심 관람"},
+                    {"time": "점심 12:30", "place": f"{city} 인근 1층 평지 입식 맛집", "note": "계단 없는 1층 테이블 좌석 식당"},
+                    {"time": "오후 14:30", "place": f"{city} 전망 좋은 대형 엘리베이터 카페", "note": "주차가 편하고 화장실이 쾌적한 베이커리 카페"},
+                    {"time": "저녁 17:30", "place": f"{city} 엘리베이터·장애인객실 보유 호텔 체크인", "note": "무리한 이동 없이 편안한 호텔 휴식"}
+                ],
+                "hotels": [
+                    {"name": f"{city} 중심권 4~5성급 무장애·특급 호텔", "type": "① 엘리베이터·장애인객실 보유 호텔", "features": "장애인 전용 객실 · 넓은 엘리베이터 · 1층 조식 뷔페"},
+                    {"name": f"{city} 가족형 리조트·콘도", "type": "② 3~4인 부모님 효도·가족 리조트", "features": "넓은 거실형 패밀리룸 · 단지 내 평지 산책로"},
+                    {"name": f"{city} 역세권·시내 신축 비즈니스 호텔", "type": "③ 무료취소 & 가성비 신축 호텔", "features": "문턱 없는 신축 객실 · 합리적인 요금 및 무료취소"}
+                ]
+            }
+    except Exception as e:
+        print(f"[신규 무장애 명소 자동 발굴 참고] {e}")
+    return {}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--build-once", action="store_true", help="정적 사이트 전체 빌드 실행")
@@ -1007,6 +1179,34 @@ def main():
 
     check_date_str = datetime.now(KST).strftime("%Y년 %m월 %d일")
     destinations = list(VERIFIED_BARRIER_FREE_DESTINATIONS)
+    existing_ids = {str(d.get("contentid")) for d in destinations}
+
+    # 기존 누적 DB 로드
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r", encoding="utf-8") as cf:
+                saved_list = json.load(cf)
+                if isinstance(saved_list, list):
+                    for item in saved_list:
+                        cid = str(item.get("contentid") or "")
+                        if cid and cid not in existing_ids:
+                            destinations.append(item)
+                            existing_ids.add(cid)
+        except Exception:
+            pass
+
+    # 매일 실행 시 KTO 무장애 API에서 신규 여행지 1건 자동 추가 발굴
+    new_spot = discover_new_kto_barrier_free_spot(existing_ids)
+    if new_spot:
+        destinations.insert(0, new_spot)
+        existing_ids.add(str(new_spot["contentid"]))
+        print(f"✨ [신규 무장애 여행지 자동 발굴 추가] {new_spot['title']} ({new_spot['city']})")
+
+    try:
+        with open(CACHE_FILE, "w", encoding="utf-8") as cf:
+            json.dump(destinations, cf, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
     for d in destinations:
         post_html = build_post_page_html(d, check_date_str)
