@@ -54,9 +54,13 @@ GPT_API_KEY = os.environ.get("OPENAI_API_KEY") or ""
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID") or "1JErLxLYPvVufyxjvi6hnfbbQL7lyy4XEGLMrKZZb0x4"
 TRIPCOM_SHEET_NAME = "트립닷컴"
 
-# 세시간전(3hoursahead, AID: 121912) 유심/eSIM 및 액티비티 기본/환경변수 슬롯
-USIMSA_AFFILIATE_URL = os.environ.get("USIMSA_AFFILIATE_URL") or "https://www.usimsa.com/"
-KLOOK_AFFILIATE_URL = os.environ.get("KLOOK_AFFILIATE_URL") or "https://www.klook.com/ko/wifi-sim-card/"
+# 세시간전(3hoursahead, AID: 121912) 클룩(Klook) 티켓·렌트카·eSIM 공식 제휴 링크 5종 (30일 쿠키 트래킹)
+USIMSA_AFFILIATE_URL = os.environ.get("USIMSA_AFFILIATE_URL") or "https://3ha.in/r/874416"
+KLOOK_SIM_TMONEY_URL = os.environ.get("KLOOK_SIM_TMONEY_URL") or "https://3ha.in/r/874419"
+KLOOK_ESIM_BUDGET_URL = os.environ.get("KLOOK_ESIM_BUDGET_URL") or "https://3ha.in/r/874423"
+KLOOK_AFFILIATE_URL = os.environ.get("KLOOK_AFFILIATE_URL") or "https://3ha.in/r/874431"
+KLOOK_CAR_RENTAL_URL = os.environ.get("KLOOK_CAR_RENTAL_URL") or "https://3ha.in/r/874439"
+TRIPCOM_KTX_TRAIN_URL = os.environ.get("TRIPCOM_KTX_TRAIN_URL") or "https://3ha.in/r/874464"
 
 client = OpenAI(api_key=GPT_API_KEY) if (OpenAI and GPT_API_KEY) else None
 
@@ -770,7 +774,7 @@ def generate_slow_persuasion_overview(dest: dict, check_date_str: str) -> str:
 
 def make_usim_and_tour_affiliate_box_html(city: str) -> str:
     """
-    [세시간전(3hoursahead, AID: 121912) 유심사(usimsa) eSIM/USIM & 클룩/마이리얼트립 투어패스 수익화 박스]
+    [세시간전(3hoursahead, AID: 121912) 클룩 모바일 입장권(874431) · 렌트카(874439) · eSIM/유심(874416/874419/874423) 수익화 박스]
     """
     usim_url = AFFILIATE_LINKS.get("usim") or USIMSA_AFFILIATE_URL
     tour_url = AFFILIATE_LINKS.get("tour") or KLOOK_AFFILIATE_URL
@@ -778,23 +782,35 @@ def make_usim_and_tour_affiliate_box_html(city: str) -> str:
 <section id="usim-and-tour-benefits" style="margin:26px 0; padding:20px; background:linear-gradient(135deg, #eef2ff 0%, #f0fdfa 100%); border:1px solid #c7d2fe; border-radius:16px;">
   <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
     <h3 style="margin:0; font-size:18px; color:#1e1b4b; font-weight:800;">
-      📶 여행 준비 필수 체크: 모바일 패스·투어 할인 &amp; 해외여행 eSIM/유심 특가
+      🎟️ {escape(city)} 무장애 여행 필수: 줄 서지 않는 모바일 티켓 · 휠체어/유모차 적재 렌트카 · eSIM 특가
     </h3>
     <span style="background:#4f46e5; color:#fff; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px;">
-      트래킹 제휴 특가 혜택
+      클룩(Klook) 공식 제휴 특가
     </span>
   </div>
   <p style="margin:0 0 14px 0; font-size:13.8px; color:#334155; line-height:1.6;">
-    <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 줄을 서지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 사전 예매하시고, 다가오는 연휴 가족 해외여행을 준비 중이시라면 <strong>CU 편의점 즉시 픽업·QR 발급이 가능한 유심사(usimsa)·글로벌 eSIM</strong> 혜택을 함께 챙겨보세요.
+    <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 대기하지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 미리 준비하시고, 접이식 휠체어·유모차가 넉넉히 실리는 <strong>SUV·승합 렌트카</strong>와 가족 여행용 <strong>5G eSIM·티머니 교통카드</strong> 혜택을 함께 확인해 보세요.
   </p>
-  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
     <a href="{escape(tour_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="flex:1; min-width:220px; text-align:center; background:#4f46e5; color:#ffffff !important; font-weight:800; font-size:13.8px; padding:11px 16px; border-radius:10px; text-decoration:none;">
-      🎟️ [{escape(city)}] 줄 서지 않는 모바일 입장권·액티비티 할인 예매하기
+       style="text-align:center; background:#4f46e5; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      🎟️ [{escape(city)}] 줄 서지 않는 클룩 모바일 입장권·패스 할인 예매
+    </a>
+    <a href="{escape(KLOOK_CAR_RENTAL_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="text-align:center; background:#047857; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      🚐 휠체어·유모차 넉넉한 SUV/카니발 클룩 렌트카 최저가 비교
     </a>
     <a href="{escape(usim_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="flex:1; min-width:220px; text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:13.8px; padding:11px 16px; border-radius:10px; text-decoration:none;">
-      📱 가족 해외여행 준비 필수! 유심사(usimsa) eSIM·유심 최저가 발급받기
+       style="text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      📶 5G 무제한 QR eSIM (SKT) 즉시 발급받기
+    </a>
+    <a href="{escape(KLOOK_SIM_TMONEY_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="text-align:center; background:#2563eb; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      🚇 무제한 유심 + 티머니(T-Money) 교통카드 패키지
+    </a>
+    <a href="{escape(TRIPCOM_KTX_TRAIN_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="text-align:center; background:#1e40af; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      🚄 부모님 효도·휠체어석 KTX 기차표 시간표 조회 &amp; 예매 (트립닷컴)
     </a>
   </div>
 </section>
@@ -886,6 +902,9 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
     <article class="card">
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;">{tags_html}</div>
       <h1>{escape(seo_title)}</h1>
+      <div style="background:#fffbeb; border:2px solid #f59e0b; border-radius:10px; padding:12px 15px; margin:0 0 14px 0; font-size:14.5px; color:#0f172a; font-weight:700; line-height:1.55;">
+        📢 세시간전 크리에이터 활동을 통해 수익이 발생하는 링크가 포함되어 있습니다. 해당 링크를 통해 상품을 구매할 경우 수수료가 지급됩니다.
+      </div>
       <p style="font-size:13.5px; color:#64748b; margin:0 0 16px 0;">
         📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(check_date_str)} (한국관광공사 열린관광·KorWithService1·집중률 API 기준)
       </p>
