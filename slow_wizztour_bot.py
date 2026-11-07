@@ -699,9 +699,12 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
     </table>
   </div>
 
-  <p style="font-size:12.8px; color:#64748b; margin:8px 0 16px 0; line-height:1.55;">
-    ※ <strong>안내 ({escape(check_date_str)} 확인 기준)</strong>: 장애인 전용 객실(Accessible Room)과 1층 배정 객실은 수량이 한정되어 있어 주말에는 빠르게 마감됩니다. 플랫폼별 기본 요금이 비슷할 때는 <strong>무료취소 가능 기한, 조식 포함 여부, 침대 구성(트윈/패밀리)</strong>을 비교해 미리 확보해 두세요.
-  </p>
+  <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px; font-size:13.2px; color:#78350f; margin:10px 0 16px 0; line-height:1.6;">
+    💡 <strong>왜 앱에서 처음부터 검색하는 것보다 위 무장애 비교표가 유리한가요? ({escape(check_date_str)} 확인 기준)</strong><br>
+    • <strong>① 30분 검색 피로 해소 (단차·엘리베이터·침대 구조 사전 필터링)</strong>: 일반 숙박 앱에서 '{escape(city)} 숙소'만 검색하면 계단뿐인 구형 펜션이나 문턱 높은 모텔이 섞여 나옵니다. 위 표는 <strong>엘리베이터·넓은 주차장·1층 동선이 검증된 호텔·리조트 권역</strong>으로 바로 연결됩니다.<br>
+    • <strong>② 희소한 '장애인 객실·저층 패밀리룸' 무료취소 선점</strong>: 호텔당 장애인 전용 객실(Accessible Room)과 1층 온돌/트윈룸은 2~3실뿐이라 주말 2주 전에 가장 먼저 마감됩니다. <strong>무료취소 가능 조건으로 먼저 선점</strong>해 두면 부모님 컨디션이나 날씨로 일정이 바뀌어도 취소 수수료 부담이 없습니다.<br>
+    • <strong>③ 현장 매표소 대기 줄 0분</strong>: 아래 모바일 입장권을 미리 준비하면 휠체어나 유모차를 끌고 매표소 줄을 서지 않고 할인가로 즉시 입장할 수 있습니다.
+  </div>
 
   <div style="text-align:center;">
     <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
@@ -862,14 +865,38 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 
     json_ld = {
         "@context": "https://schema.org",
-        "@type": "TouristAttraction",
-        "name": title,
-        "description": meta_desc,
-        "image": dest.get("image", ""),
-        "address": {"@type": "PostalAddress", "streetAddress": dest.get("addr", ""), "addressLocality": city, "addressRegion": province, "addressCountry": "KR"},
-        "isAccessibleForFree": True,
-        "publicAccess": True,
-        "touristType": ["Wheelchair Users", "Senior Citizens", "Families with Strollers"],
+        "@graph": [
+            {
+                "@type": "TouristAttraction",
+                "name": title,
+                "description": meta_desc,
+                "image": dest.get("image", ""),
+                "address": {"@type": "PostalAddress", "streetAddress": dest.get("addr", ""), "addressLocality": city, "addressRegion": province, "addressCountry": "KR"},
+                "isAccessibleForFree": True,
+                "publicAccess": True,
+                "touristType": ["Wheelchair Users", "Senior Citizens", "Families with Strollers"],
+                "isPartOf": {"@id": "https://www.wizztour.com/#organization"}
+            },
+            {
+                "@type": "Organization",
+                "@id": "https://www.wizztour.com/#organization",
+                "name": "WizzTour (위즈투어 대한민국 4대 여행 생태계)",
+                "url": "https://www.wizztour.com",
+                "sameAs": [
+                    "https://www.wizztour.com",
+                    "https://info.wizztour.com",
+                    "https://en.wizztour.com",
+                    "https://slow.wizztour.com",
+                    "https://www.threads.net/@visit_wizztour"
+                ],
+                "subOrganization": [
+                    {"@type": "WebSite", "name": "WizzTour 전국 축제·당일치기 메인 가이드", "url": "https://www.wizztour.com"},
+                    {"@type": "WebSite", "name": "WizzTour Info 전국 캠핑·글램핑·민물낚시 지도", "url": "https://info.wizztour.com"},
+                    {"@type": "WebSite", "name": "WizzTour Global 영문 한국 여행 가이드", "url": "https://en.wizztour.com"},
+                    {"@type": "WebSite", "name": "WizzTour Slow 무장애·부모님 효도·유모차 평지 여행", "url": "https://slow.wizztour.com"}
+                ]
+            }
+        ]
     }
 
     return f"""<!DOCTYPE html>
@@ -952,22 +979,46 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
       <!-- 세시간전 유심사(usimsa) eSIM & 클룩/마이리얼트립 투어패스 제휴 박스 -->
       {usim_tour_html}
 
-      <!-- [STEP 6 - 3차 링크 배치: 마무리 추천 대상 정리 및 4대 WizzTour 생태계 허브] -->
-      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:18px 20px; margin-top:28px;">
-        <h3 style="margin:0 0 8px 0; color:#92400e; font-size:17px;">✅ 출발 전 최종 체크리스트 &amp; 이런 분께 특히 추천합니다</h3>
+      <!-- [STEP 6 - 3차 링크 배치: 출발 당일 아침 30초 체크리스트(북마크 락인) & 4대 WizzTour 거미줄 생태계 허브] -->
+      <div style="background:#fffbeb; border:2px solid #f59e0b; border-radius:14px; padding:18px 20px; margin-top:28px;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0; color:#92400e; font-size:17px;">📌 [출발 당일 아침 다시 꺼내보는] 보호자·부모님·유모차 30초 체크리스트</h3>
+          <button onclick="navigator.clipboard.writeText(window.location.href); this.innerText='✅ 링크 복사 완료! 가족 단톡방에 붙여넣으세요';" style="background:#d97706; color:#ffffff; border:none; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:800; cursor:pointer;">
+            🔗 가족 카톡방에 이 코스 공유·저장하기
+          </button>
+        </div>
+        <p style="margin:0 0 10px 0; font-size:13.5px; color:#78350f; line-height:1.6;">
+          💡 <strong>지금 이 페이지를 북마크(Ctrl+D)하거나 가족 단톡방에 공유해 두세요!</strong> 출발 당일 아침 아래 4가지만 30초 만에 점검하면 현장에서 당황하지 않습니다:
+        </p>
         <ul style="margin:0 0 14px 0; padding-left:18px; font-size:14px; color:#78350f; line-height:1.65;">
-          <li><strong>추천 대상</strong>: 수동·전동 휠체어 이용 가족, 무릎 관절이 약하신 부모님 효도여행, 쌍둥이·영유아 유모차 나들이객</li>
-          <li><strong>숙소 예약 팁</strong>: 장애인 전용 객실(Accessible Room) 또는 엘리베이터 인접 저층 객실은 예약 시 요청사항(Special Request)에 기재하시면 배정에 큰 도움이 됩니다.</li>
+          <li>☑️ <strong>추천 대상</strong>: 수동·전동 휠체어 이용 가족, 무릎 관절이 약하신 부모님 효도여행, 쌍둥이·영유아 유모차 나들이객</li>
+          <li>☑️ <strong>혼잡 피하는 골든타임 도착</strong>: 장애인 전용 주차구역 확보를 위해 위 빅데이터 권장 시간(오전 09:30~11:00) 출발 권장</li>
+          <li>☑️ <strong>호텔 객실 배정 요청(Special Request)</strong>: 예약한 호텔에 '장애인 전용 객실(Accessible Room)' 또는 '엘리베이터 인접 저층 객실' 배정 사전 확인</li>
+          <li>☑️ <strong>현장 대여 &amp; 상비약</strong>: 복지카드(장애인 주차·할인용), 부모님 상비약, 현장 휠체어·유모차 대여소 위치(주출입구 안내소) 체크</li>
         </ul>
         <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
           <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
              style="display:inline-block; background:#ea580c; color:#fff !important; font-weight:800; font-size:14px; padding:11px 22px; border-radius:999px; text-decoration:none;">
-            🏨 [{escape(city)}] 할인 혜택 확인 후 내 날짜 숙소 예약하기
+            🏨 [{escape(city)}] 무료취소 가능 무장애·효도 숙소 예약하기
           </a>
           <a href="{SITE_BASE_URL}/index.html"
              style="display:inline-block; background:#0f172a; color:#fff !important; font-weight:700; font-size:14px; padding:11px 20px; border-radius:999px; text-decoration:none;">
-            🐢 전국 무장애·효도·유모차 코스 더 보기
+            🐢 전국 무장애·효도·유모차 코스 전체 보기
           </a>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; padding:20px 18px; background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; border-radius:16px; text-align:center;">
+        <p style="color:#5eead4; font-size:12.5px; font-weight:800; letter-spacing:0.8px; margin:0 0 6px 0;">🕸️ WIZZTOUR 4대 여행 생태계 거미줄 네트워크</p>
+        <h3 style="color:#ffffff; font-size:17px; margin:0 0 8px 0;">함께 비교하면 좋은 WizzTour 공식 자매 사이트</h3>
+        <p style="color:#cbd5e1; font-size:13.5px; margin:0 0 14px 0; line-height:1.55;">
+          {escape(city)} 지역의 계절 축제 일정, 감성 글램핑·민물낚시 명당 지도, 외국인 동행용 영문 가이드를 한 번에 연결해 보세요.
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+          <a href="https://www.wizztour.com" target="_blank" rel="noopener" style="background:#f97316; color:#fff !important; padding:10px 16px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700;">🎉 전국 축제·당일치기 메인 (wizztour.com)</a>
+          <a href="https://info.wizztour.com" target="_blank" rel="noopener" style="background:#10b981; color:#fff !important; padding:10px 16px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700;">🏕️ 감성 글램핑·낚시 명당 (info.wizztour.com)</a>
+          <a href="https://info.wizztour.com/festival_map.html" target="_blank" rel="noopener" style="background:#2563eb; color:#fff !important; padding:10px 16px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700;">🗺️ 전국 레저·축제 전자지도</a>
+          <a href="https://en.wizztour.com" target="_blank" rel="noopener" style="background:#4f46e5; color:#fff !important; padding:10px 16px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700;">🌐 English Korea Guide (en.wizztour.com)</a>
         </div>
       </div>
     </article>
@@ -1122,6 +1173,63 @@ def build_seo_assets(destinations: list):
         f.write(robots_txt)
     with open(os.path.join(BASE_DIR, "CNAME"), "w", encoding="utf-8") as f:
         f.write("slow.wizztour.com\n")
+    with open(os.path.join(BASE_DIR, "wizztourindexnow2026key99a8b7c6.txt"), "w", encoding="utf-8") as f:
+        f.write("wizztourindexnow2026key99a8b7c6")
+
+
+def notify_google_and_search_engines(url_list: list):
+    """
+    [slow.wizztour.com 자동 색인(Auto-Indexing) 3중 엔진]
+    1) Google Indexing API (신규/업데이트 상세페이지 즉시 색인 요청)
+    2) Google Search Console Sitemaps API (https://slow.wizztour.com/sitemap.xml 제출)
+    3) IndexNow API (Bing, Copilot, Yahoo, DuckDuckGo 즉시 색인)
+    """
+    if not url_list:
+        return
+    cred_raw = os.environ.get("GOOGLE_SHEET_CREDENTIALS")
+    if cred_raw:
+        try:
+            from oauth2client.service_account import ServiceAccountCredentials
+            cred_dict = json.loads(cred_raw)
+            idx_scopes = [
+                "https://www.googleapis.com/auth/indexing",
+                "https://www.googleapis.com/auth/webmasters"
+            ]
+            idx_creds = ServiceAccountCredentials.from_json_keyfile_dict(cred_dict, idx_scopes)
+            access_token = idx_creds.get_access_token().access_token
+            headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+
+            for target_url in url_list[:3]:
+                r_idx = requests.post(
+                    "https://indexing.googleapis.com/v3/urlNotifications:publish",
+                    headers=headers,
+                    json={"url": target_url, "type": "URL_UPDATED"},
+                    timeout=8,
+                )
+                if r_idx.status_code == 200:
+                    print(f"🚀 [Google Indexing API 성공] {target_url}")
+
+            for site_prop in (f"{SITE_BASE_URL}/", "sc-domain:slow.wizztour.com", "sc-domain:wizztour.com"):
+                sm_api = f"https://www.googleapis.com/webmasters/v3/sites/{quote(site_prop, safe='')}/sitemaps/{quote(SITE_BASE_URL + '/sitemap.xml', safe='')}"
+                r_sm = requests.put(sm_api, headers=headers, timeout=8)
+                if r_sm.status_code in (200, 204):
+                    print(f"✅ [Google Search Console] Sitemap 제출 완료: {site_prop}")
+                    break
+        except Exception as e:
+            print(f"[Google 자동 색인 참고] {e}")
+
+    try:
+        indexnow_payload = {
+            "host": "slow.wizztour.com",
+            "key": "wizztourindexnow2026key99a8b7c6",
+            "keyLocation": f"{SITE_BASE_URL}/wizztourindexnow2026key99a8b7c6.txt",
+            "urlList": url_list[:20]
+        }
+        r_in = requests.post("https://api.indexnow.org/indexnow", json=indexnow_payload, timeout=8)
+        if r_in.status_code in (200, 202):
+            print(f"⚡ [IndexNow 즉시 색인 완료] slow.wizztour.com ({len(url_list[:20])}개 URL)")
+    except Exception as e:
+        print(f"[IndexNow 참고] {e}")
 
 
 def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
@@ -1250,6 +1358,8 @@ def main():
         f.write(index_html)
 
     build_seo_assets(destinations)
+    all_urls = [f"{SITE_BASE_URL}/"] + [f"{SITE_BASE_URL}/posts/{d['slug']}.html" for d in destinations]
+    notify_google_and_search_engines(all_urls)
     print(f"🎉 [WizzTour Slow 빌드 완료] index.html 및 상세 {len(destinations)}건, sitemap.xml, rss.xml, CNAME 생성 완료!")
 
 
