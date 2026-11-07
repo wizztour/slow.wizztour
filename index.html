@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WizzTour Slow (slow.wizztour.com) | 계단·턱 없는 무장애·부모님 효도·유모차 평지 여행 &amp; 편안한 숙소 가이드</title>
+  <meta name="description" content="한국관광공사 열린관광(KorWithService1) & 빅데이터 혼잡도 예측 연동! 휠체어 이용자, 무릎 약한 부모님 효도여행, 유모차 나들이를 위한 계단 없는 평지 산책 코스와 엘리베이터·장애인객실 호텔 비교 포털.">
+  <link rel="canonical" href="https://slow.wizztour.com/">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; }
+    .hero { background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:48px 20px 40px; text-align:center; }
+    .hero h1 { margin:10px 0 12px; font-size:30px; font-weight:800; line-height:1.35; }
+    .hero p { max-width:680px; margin:0 auto 22px; color:#ccfbf1; font-size:15px; line-height:1.65; }
+    .filter-bar { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:760px; margin:0 auto; }
+    .filter-btn { background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:700; transition:0.2s; }
+    .filter-btn.active, .filter-btn:hover { background:#14b8a6; border-color:#14b8a6; color:#0f172a; }
+    .container { max-width:1100px; margin:0 auto; padding:32px 18px 60px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(310px, 1fr)); gap:20px; }
+    .spot-card { background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(15,23,42,0.05); transition:transform 0.2s; }
+    .spot-card:hover { transform:translateY(-4px); }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <span style="background:#14b8a6; color:#0f172a; font-size:12px; font-weight:800; padding:4px 12px; border-radius:999px;">
+      ♿ 한국관광공사 무장애 관광(KorWithService1) · 빅데이터 혼잡도 공식 연동
+    </span>
+    <h1>느린 걸음으로 더 깊게 쉬어가는 여행, WizzTour Slow</h1>
+    <p>
+      계단과 문턱 걱정 없이 <strong>휠체어·무릎 약한 부모님·유모차</strong>가 편안하게 산책할 수 있는 전국 무장애 평지 코스와<br>
+      <strong>엘리베이터·장애인 전용 객실·1층 조식 동선</strong>이 검증된 숙소를 한눈에 비교해 보세요.
+    </p>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterSpots('ALL', this)">전체 보기</button>
+      <button class="filter-btn" onclick="filterSpots('휠체어추천', this)">🦽 휠체어 무장애 코스</button>
+      <button class="filter-btn" onclick="filterSpots('부모님효도', this)">👵 부모님 효도 평지여행</button>
+      <button class="filter-btn" onclick="filterSpots('유모차산책', this)">👶 유모차 나들이 명소</button>
+      <button class="filter-btn" onclick="filterSpots('무장애호텔', this)">🏨 무장애·엘리베이터 호텔</button>
+    </div>
+  </section>
+
+  <main class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+      <h2 style="margin:0; font-size:21px; font-weight:800;">✨ 전국 검증된 무장애·효도·유모차 평지 여행 코스</h2>
+      <span style="font-size:13px; color:#64748b;">최종 업데이트: 2026년 11월 07일</span>
+    </div>
+    <div class="grid" id="spotsGrid">
+      <article class="spot-card" data-tags="휠체어추천 부모님효도 유모차산책 무장애호텔 경주 경북">
+          <a href="posts/gyeongju-bomun-lake-barrier-free.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:url('https://images.unsplash.com/photo-1548115184-bc6544d06a58?auto=format&amp;fit=crop&amp;w=1000&amp;q=80') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
+                📍 경북 · 경주
+              </span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#휠체어추천</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#부모님효도</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#유모차산책</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#무장애호텔</span></div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">경주 보문관광단지 &amp; 보문호반길</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">경주 보문호반길은 한국관광공사 열린관광지로 선정된 대표적인 무장애 평지 산책 코스입니다. 호수 둘레를 따라 단차(턱)가 거의 없는 넓은 데크길과 포장 산책로가 이어져 수동·전동 휠체어, 무릎이 약한 어르신,…</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>→</span>
+              </div>
+            </div>
+          </a>
+        </article><article class="spot-card" data-tags="휠체어추천 부모님효도 유모차산책 바다평지뷰 강릉 강원">
+          <a href="posts/gangneung-gyeongpo-yeon-gok-barrier-free.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=1000&amp;q=80') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
+                📍 강원 · 강릉
+              </span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#휠체어추천</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#부모님효도</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#유모차산책</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#바다평지뷰</span></div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">강릉 경포호 산책로 &amp; 연곡해변 솔향기캠핑 무장애 코스</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">강릉 경포호 둘레길과 해변 무장애 데크로드(열린관광지)는 모래사장에 바퀴가 빠지지 않도록 해송 숲과 바다 앞까지 목재 데크길이 연결된 동해안 최고의 무장애 힐링 코스입니다. 휠체어와 유모차는 물론 무릎 관절…</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>→</span>
+              </div>
+            </div>
+          </a>
+        </article><article class="spot-card" data-tags="부모님효도 휠체어추천 유모차산책 미식여행 전주 전북">
+          <a href="posts/jeonju-hanok-village-barrier-free.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:url('https://images.unsplash.com/photo-1583833008338-31a6657917ab?auto=format&amp;fit=crop&amp;w=1000&amp;q=80') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
+                📍 전북 · 전주
+              </span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#부모님효도</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#휠체어추천</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#유모차산책</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#미식여행</span></div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">전주 한옥마을 &amp; 경기전 평지 돌담길 무장애 나들이 코스</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">전주 한옥마을과 경기전 일대는 전체 지형이 오르막 없는 평지로 이루어져 있어 부모님 효도여행, 휠체어 이용자, 유모차 동반 가족에게 가장 만족도가 높은 대표 여행지입니다. 태조로와 은행로 보행자 전용 거리가…</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>→</span>
+              </div>
+            </div>
+          </a>
+        </article><article class="spot-card" data-tags="휠체어추천 부모님효도 유모차산책 열린관광지 순천 전남">
+          <a href="posts/suncheonman-national-garden-barrier-free.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:url('https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&amp;fit=crop&amp;w=1000&amp;q=80') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
+                📍 전남 · 순천
+              </span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#휠체어추천</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#부모님효도</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#유모차산책</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#열린관광지</span></div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">순천만국가정원 &amp; 순천만습지 무장애 데크길 힐링 코스</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">순천만국가정원과 순천만습지는 문화체육관광부·한국관광공사 선정 대표 열린관광지로, 광활한 정원 전체가 완만한 평지 포장길로 설계되어 있고 순천만습지 갈대밭 역시 문턱 없는 무장애 목재 데크가 끝까지 이어집니다…</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>→</span>
+              </div>
+            </div>
+          </a>
+        </article><article class="spot-card" data-tags="휠체어추천 부모님효도 유모차산책 숲속평지데크 제주 제주">
+          <a href="posts/jeju-jeolmul-forest-barrier-free.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&amp;fit=crop&amp;w=1000&amp;q=80') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
+                📍 제주 · 제주
+              </span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#휠체어추천</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#부모님효도</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#유모차산책</span><span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#숲속평지데크</span></div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">제주 절물자연휴양림 무장애 나눔길 &amp; 서귀포 치유의숲 평지 코스</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">제주 절물자연휴양림의 &#x27;무장애 나눔길(생이소리길)&#x27;은 울창한 삼나무 숲 사이로 약 7km에 달하는 완만한 평지 목재 데크가 조성되어 있어, 휠체어 이용자와 무릎이 약한 어르신, 유모차를 끈 가족이 계단 하나…</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>→</span>
+              </div>
+            </div>
+          </a>
+        </article>
+    </div>
+
+    <div style="margin-top:42px; padding:24px; background:#0f172a; color:#ffffff; border-radius:18px; text-align:center;">
+      <h3 style="margin:0 0 8px 0; font-size:19px; color:#5eead4;">🗺️ WizzTour 4대 여행 생태계 바로가기</h3>
+      <p style="margin:0 0 16px 0; font-size:14px; color:#cbd5e1;">목적에 맞는 WizzTour 전문 가이드에서 맞춤형 코스와 숙소 혜택을 확인하세요.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+        <a href="https://www.wizztour.com" target="_blank" rel="noopener" style="background:#f97316; color:#fff; padding:10px 18px; border-radius:999px; text-decoration:none; font-size:13.5px; font-weight:700;">🎉 전국 축제·당일치기 (wizztour.com)</a>
+        <a href="https://info.wizztour.com" target="_blank" rel="noopener" style="background:#10b981; color:#fff; padding:10px 18px; border-radius:999px; text-decoration:none; font-size:13.5px; font-weight:700;">⛺ 캠핑·민물낚시 지도 (info.wizztour.com)</a>
+        <a href="https://en.wizztour.com" target="_blank" rel="noopener" style="background:#3b82f6; color:#fff; padding:10px 18px; border-radius:999px; text-decoration:none; font-size:13.5px; font-weight:700;">🌐 English Korea Guide (en.wizztour.com)</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function filterSpots(tag, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.spot-card').forEach(card => {
+        const tags = card.getAttribute('data-tags') || '';
+        card.style.display = (tag === 'ALL' || tags.includes(tag)) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://slow.wizztour.com/sitemap.xml
