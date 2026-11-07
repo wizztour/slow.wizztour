@@ -62,6 +62,7 @@ KLOOK_AFFILIATE_URL = os.environ.get("KLOOK_AFFILIATE_URL") or "https://3ha.in/r
 KLOOK_CAR_RENTAL_URL = os.environ.get("KLOOK_CAR_RENTAL_URL") or "https://3ha.in/r/874439"
 TRIPCOM_KTX_TRAIN_URL = os.environ.get("TRIPCOM_KTX_TRAIN_URL") or "https://3ha.in/r/874464"
 TRIPCOM_SNAP_PHOTO_URL = os.environ.get("TRIPCOM_SNAP_PHOTO_URL") or "https://3ha.in/r/874468"
+TRIPCOM_SEOUL_TICKETS_URL = os.environ.get("TRIPCOM_SEOUL_TICKETS_URL") or "https://3ha.in/r/874492"
 
 client = OpenAI(api_key=GPT_API_KEY) if (OpenAI and GPT_API_KEY) else None
 
@@ -816,6 +817,10 @@ def make_usim_and_tour_affiliate_box_html(city: str) -> str:
     <a href="{escape(TRIPCOM_SNAP_PHOTO_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="text-align:center; background:#c026d3; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
       📸 경복궁·한옥마을 부모님 효도·가족 한복 스냅사진 촬영 예약 (트립닷컴)
+    </a>
+    <a href="{escape(TRIPCOM_SEOUL_TICKETS_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="text-align:center; background:#7c3aed; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      🗼 서울·수도권 전망대·아쿠아리움·명소 모바일 입장권 특가 (트립닷컴)
     </a>
   </div>
 </section>
