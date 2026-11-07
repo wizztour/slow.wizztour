@@ -61,6 +61,7 @@ KLOOK_ESIM_BUDGET_URL = os.environ.get("KLOOK_ESIM_BUDGET_URL") or "https://3ha.
 KLOOK_AFFILIATE_URL = os.environ.get("KLOOK_AFFILIATE_URL") or "https://3ha.in/r/874431"
 KLOOK_CAR_RENTAL_URL = os.environ.get("KLOOK_CAR_RENTAL_URL") or "https://3ha.in/r/874439"
 TRIPCOM_KTX_TRAIN_URL = os.environ.get("TRIPCOM_KTX_TRAIN_URL") or "https://3ha.in/r/874464"
+TRIPCOM_SNAP_PHOTO_URL = os.environ.get("TRIPCOM_SNAP_PHOTO_URL") or "https://3ha.in/r/874468"
 
 client = OpenAI(api_key=GPT_API_KEY) if (OpenAI and GPT_API_KEY) else None
 
@@ -811,6 +812,10 @@ def make_usim_and_tour_affiliate_box_html(city: str) -> str:
     <a href="{escape(TRIPCOM_KTX_TRAIN_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="text-align:center; background:#1e40af; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
       🚄 부모님 효도·휠체어석 KTX 기차표 시간표 조회 &amp; 예매 (트립닷컴)
+    </a>
+    <a href="{escape(TRIPCOM_SNAP_PHOTO_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+       style="text-align:center; background:#c026d3; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
+      📸 경복궁·한옥마을 부모님 효도·가족 한복 스냅사진 촬영 예약 (트립닷컴)
     </a>
   </div>
 </section>
