@@ -1,0 +1,8 @@
+.git/
+.github/
+*.py
+requirements.txt
+README.md
+wrangler.jsonc
+.gitignore
+data/
