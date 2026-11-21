@@ -254,15 +254,26 @@ def load_region_affiliate_links() -> dict:
 AFFILIATE_LINKS = load_region_affiliate_links()
 
 
-_SLOW_TRIPCOM_CITY_IDS = {
-    "서울": "274",
-    "부산": "253",
-    "제주": "737",
-    "제주시": "737",
-    "서귀포": "35796",
-    "인천": "410",
-    "포항": "3369",
-}
+def _load_slow_tripcom_city_ids() -> dict:
+    base = {
+        "서울": "274", "부산": "253", "제주": "737",
+        "제주시": "737", "서귀포": "35796", "인천": "410", "포항": "3369",
+    }
+    map_path = os.path.join(DATA_DIR, "tripcom_city_map.json")
+    if os.path.exists(map_path):
+        try:
+            with open(map_path, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+                if isinstance(raw, dict):
+                    for k, v in raw.items():
+                        if isinstance(v, dict) and v.get("city_id"):
+                            base[k] = str(v["city_id"])
+        except Exception:
+            pass
+    return base
+
+
+_SLOW_TRIPCOM_CITY_IDS = _load_slow_tripcom_city_ids()
 
 
 def _append_tripcom_affiliate_params(url: str) -> str:
@@ -278,18 +289,20 @@ def _append_tripcom_affiliate_params(url: str) -> str:
 
 def resolve_hotel_affiliate_url(city: str, province: str = "", custom_keyword: str = "") -> str:
     city_clean = (city or "").strip()
-    city_id = _SLOW_TRIPCOM_CITY_IDS.get(city_clean) or _SLOW_TRIPCOM_CITY_IDS.get((province or "").strip())
-    kw = (custom_keyword or city_clean or province or "한국").strip()
+    prov_clean = (province or "").strip()
+    city_id = _SLOW_TRIPCOM_CITY_IDS.get(city_clean) or _SLOW_TRIPCOM_CITY_IDS.get(prov_clean)
+    kw = (custom_keyword or city_clean or prov_clean or "한국").strip()
+    disp = city_clean or prov_clean or kw
+    if city_id:
+        return _append_tripcom_affiliate_params(
+            f"https://kr.trip.com/hotels/list?city={city_id}&display={quote(disp)}&optionId={city_id}&optionType=City&optionName={quote(disp)}"
+        )
     if custom_keyword:
-        if city_id and custom_keyword == city_clean:
-            return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?cityId={city_id}&countryId=42")
         return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(city_clean or kw)}")
     h_map = AFFILIATE_LINKS.get("hotel") or {}
     for key in (city, province):
         if key and h_map.get(key):
             return _append_tripcom_affiliate_params(h_map[key])
-    if city_id:
-        return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?cityId={city_id}&countryId=42")
     return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
 
 

@@ -1,0 +1,1157 @@
+{
+  "서울": {
+    "city_id": "274",
+    "slug": "seoul",
+    "name": "서울"
+  },
+  "부산": {
+    "city_id": "253",
+    "slug": "busan",
+    "name": "부산"
+  },
+  "대구": {
+    "city_id": "1287",
+    "slug": "daegu",
+    "name": "대구"
+  },
+  "인천": {
+    "city_id": "410",
+    "slug": "incheon",
+    "name": "인천"
+  },
+  "광주": {
+    "city_id": "738",
+    "slug": "gwangju",
+    "name": "광주"
+  },
+  "대전": {
+    "city_id": "61292",
+    "slug": "daejeon",
+    "name": "대전"
+  },
+  "울산": {
+    "city_id": "3368",
+    "slug": "ulsan",
+    "name": "울산"
+  },
+  "세종": {
+    "city_id": "696535",
+    "slug": "sejong",
+    "name": "세종"
+  },
+  "제주": {
+    "city_id": "737",
+    "slug": "jeju",
+    "name": "제주"
+  },
+  "수원": {
+    "city_id": "5980",
+    "slug": "suwon",
+    "name": "수원"
+  },
+  "성남": {
+    "city_id": "61636",
+    "slug": "seongnam",
+    "name": "성남"
+  },
+  "고양": {
+    "city_id": "61345",
+    "slug": "goyang",
+    "name": "고양"
+  },
+  "용인": {
+    "city_id": "90727",
+    "slug": "yongin",
+    "name": "용인"
+  },
+  "부천": {
+    "city_id": "90729",
+    "slug": "bucheon",
+    "name": "부천"
+  },
+  "화성": {
+    "city_id": "61371",
+    "slug": "hwaseong",
+    "name": "화성"
+  },
+  "평택": {
+    "city_id": "61580",
+    "slug": "pyeongtaek",
+    "name": "평택"
+  },
+  "안양": {
+    "city_id": "90740",
+    "slug": "anyang",
+    "name": "안양"
+  },
+  "안산": {
+    "city_id": "90739",
+    "slug": "ansan",
+    "name": "안산"
+  },
+  "남양주": {
+    "city_id": "90734",
+    "slug": "namyangju",
+    "name": "남양주"
+  },
+  "김포": {
+    "city_id": "61335",
+    "slug": "gimpo",
+    "name": "김포"
+  },
+  "파주": {
+    "city_id": "61533",
+    "slug": "paju",
+    "name": "파주"
+  },
+  "시흥": {
+    "city_id": "61645",
+    "slug": "siheung",
+    "name": "시흥"
+  },
+  "군포": {
+    "city_id": "61353",
+    "slug": "gunpo",
+    "name": "군포"
+  },
+  "의정부": {
+    "city_id": "7717",
+    "slug": "uijeongbu",
+    "name": "의정부"
+  },
+  "광명": {
+    "city_id": "79339",
+    "slug": "gwangmyeong",
+    "name": "광명"
+  },
+  "하남": {
+    "city_id": "79251",
+    "slug": "hanam",
+    "name": "하남"
+  },
+  "오산": {
+    "city_id": "90735",
+    "slug": "osan",
+    "name": "오산"
+  },
+  "구리": {
+    "city_id": "72364",
+    "slug": "guri",
+    "name": "구리"
+  },
+  "안성": {
+    "city_id": "90733",
+    "slug": "anseong",
+    "name": "안성"
+  },
+  "의왕": {
+    "city_id": "61717",
+    "slug": "uiwang",
+    "name": "의왕"
+  },
+  "포천": {
+    "city_id": "72363",
+    "slug": "pocheon",
+    "name": "포천"
+  },
+  "이천": {
+    "city_id": "90730",
+    "slug": "icheon",
+    "name": "이천"
+  },
+  "양주": {
+    "city_id": "90738",
+    "slug": "yangju",
+    "name": "양주"
+  },
+  "동두천": {
+    "city_id": "90728",
+    "slug": "dongducheon",
+    "name": "동두천"
+  },
+  "과천": {
+    "city_id": "104145",
+    "slug": "gwacheon",
+    "name": "과천"
+  },
+  "가평군": {
+    "city_id": "78430",
+    "slug": "gapyeong",
+    "name": "가평군"
+  },
+  "가평": {
+    "city_id": "78430",
+    "slug": "gapyeong",
+    "name": "가평군"
+  },
+  "양평군": {
+    "city_id": "62228",
+    "slug": "yangpyeong",
+    "name": "양평군"
+  },
+  "양평": {
+    "city_id": "62228",
+    "slug": "yangpyeong",
+    "name": "양평군"
+  },
+  "연천군": {
+    "city_id": "91803",
+    "slug": "yeoncheon",
+    "name": "연천군"
+  },
+  "연천": {
+    "city_id": "91803",
+    "slug": "yeoncheon",
+    "name": "연천군"
+  },
+  "춘천": {
+    "city_id": "35788",
+    "slug": "chuncheon",
+    "name": "춘천"
+  },
+  "원주": {
+    "city_id": "72358",
+    "slug": "wonju",
+    "name": "원주"
+  },
+  "강릉": {
+    "city_id": "61325",
+    "slug": "gangneung",
+    "name": "강릉"
+  },
+  "동해": {
+    "city_id": "58529",
+    "slug": "donghae",
+    "name": "동해"
+  },
+  "태백": {
+    "city_id": "61671",
+    "slug": "taebaek",
+    "name": "태백"
+  },
+  "속초": {
+    "city_id": "35793",
+    "slug": "sokcho",
+    "name": "속초"
+  },
+  "삼척": {
+    "city_id": "78904",
+    "slug": "samcheok",
+    "name": "삼척"
+  },
+  "홍천군": {
+    "city_id": "72360",
+    "slug": "hongcheon",
+    "name": "홍천군"
+  },
+  "홍천": {
+    "city_id": "72360",
+    "slug": "hongcheon",
+    "name": "홍천군"
+  },
+  "횡성군": {
+    "city_id": "78905",
+    "slug": "hoengseong",
+    "name": "횡성군"
+  },
+  "횡성": {
+    "city_id": "78905",
+    "slug": "hoengseong",
+    "name": "횡성군"
+  },
+  "영월군": {
+    "city_id": "78906",
+    "slug": "yeongwol",
+    "name": "영월군"
+  },
+  "영월": {
+    "city_id": "78906",
+    "slug": "yeongwol",
+    "name": "영월군"
+  },
+  "평창군": {
+    "city_id": "35792",
+    "slug": "pyeongchang",
+    "name": "평창군"
+  },
+  "평창": {
+    "city_id": "35792",
+    "slug": "pyeongchang",
+    "name": "평창군"
+  },
+  "정선군": {
+    "city_id": "61379",
+    "slug": "jeongseon",
+    "name": "정선군"
+  },
+  "정선": {
+    "city_id": "61379",
+    "slug": "jeongseon",
+    "name": "정선군"
+  },
+  "철원군": {
+    "city_id": "78907",
+    "slug": "cheorwon",
+    "name": "철원군"
+  },
+  "철원": {
+    "city_id": "78907",
+    "slug": "cheorwon",
+    "name": "철원군"
+  },
+  "화천군": {
+    "city_id": "78908",
+    "slug": "hwacheon",
+    "name": "화천군"
+  },
+  "화천": {
+    "city_id": "78908",
+    "slug": "hwacheon",
+    "name": "화천군"
+  },
+  "양구군": {
+    "city_id": "78909",
+    "slug": "yanggu",
+    "name": "양구군"
+  },
+  "양": {
+    "city_id": "78909",
+    "slug": "yanggu",
+    "name": "양구군"
+  },
+  "인제군": {
+    "city_id": "72359",
+    "slug": "inje",
+    "name": "인제군"
+  },
+  "인제": {
+    "city_id": "72359",
+    "slug": "inje",
+    "name": "인제군"
+  },
+  "고성군": {
+    "city_id": "78910",
+    "slug": "goseong",
+    "name": "고성군"
+  },
+  "고성": {
+    "city_id": "78910",
+    "slug": "goseong",
+    "name": "고성군"
+  },
+  "양양군": {
+    "city_id": "6430",
+    "slug": "yangyang",
+    "name": "양양군"
+  },
+  "양양": {
+    "city_id": "6430",
+    "slug": "yangyang",
+    "name": "양양군"
+  },
+  "청주": {
+    "city_id": "736",
+    "slug": "cheongju",
+    "name": "청주"
+  },
+  "충주": {
+    "city_id": "4120",
+    "slug": "chungju",
+    "name": "충주"
+  },
+  "제천": {
+    "city_id": "61378",
+    "slug": "jecheon",
+    "name": "제천"
+  },
+  "보은군": {
+    "city_id": "61229",
+    "slug": "boeun",
+    "name": "보은군"
+  },
+  "보은": {
+    "city_id": "61229",
+    "slug": "boeun",
+    "name": "보은군"
+  },
+  "옥천군": {
+    "city_id": "128276",
+    "slug": "okcheon",
+    "name": "옥천군"
+  },
+  "옥천": {
+    "city_id": "128276",
+    "slug": "okcheon",
+    "name": "옥천군"
+  },
+  "영동군": {
+    "city_id": "128273",
+    "slug": "yeongdong",
+    "name": "영동군"
+  },
+  "영동": {
+    "city_id": "128273",
+    "slug": "yeongdong",
+    "name": "영동군"
+  },
+  "진천군": {
+    "city_id": "79296",
+    "slug": "jincheon",
+    "name": "진천군"
+  },
+  "진천": {
+    "city_id": "79296",
+    "slug": "jincheon",
+    "name": "진천군"
+  },
+  "괴산군": {
+    "city_id": "128268",
+    "slug": "goesan",
+    "name": "괴산군"
+  },
+  "괴산": {
+    "city_id": "128268",
+    "slug": "goesan",
+    "name": "괴산군"
+  },
+  "음성군": {
+    "city_id": "79256",
+    "slug": "eumseong",
+    "name": "음성군"
+  },
+  "음성": {
+    "city_id": "79256",
+    "slug": "eumseong",
+    "name": "음성군"
+  },
+  "단양군": {
+    "city_id": "61294",
+    "slug": "danyang",
+    "name": "단양군"
+  },
+  "단양": {
+    "city_id": "61294",
+    "slug": "danyang",
+    "name": "단양군"
+  },
+  "천안": {
+    "city_id": "58525",
+    "slug": "cheonan",
+    "name": "천안"
+  },
+  "공주": {
+    "city_id": "88099",
+    "slug": "gongju",
+    "name": "공주"
+  },
+  "보령": {
+    "city_id": "61232",
+    "slug": "boryeong",
+    "name": "보령"
+  },
+  "아산": {
+    "city_id": "61169",
+    "slug": "asan",
+    "name": "아산"
+  },
+  "서산": {
+    "city_id": "79253",
+    "slug": "seosan",
+    "name": "서산"
+  },
+  "논산": {
+    "city_id": "128262",
+    "slug": "nonsan",
+    "name": "논산"
+  },
+  "계룡": {
+    "city_id": "128252",
+    "slug": "gyeryong",
+    "name": "계룡"
+  },
+  "당진": {
+    "city_id": "93717",
+    "slug": "dangjin",
+    "name": "당진"
+  },
+  "금산군": {
+    "city_id": "128247",
+    "slug": "geumsan",
+    "name": "금산군"
+  },
+  "금산": {
+    "city_id": "128247",
+    "slug": "geumsan",
+    "name": "금산군"
+  },
+  "부여군": {
+    "city_id": "78703",
+    "slug": "buyeo",
+    "name": "부여군"
+  },
+  "부여": {
+    "city_id": "78703",
+    "slug": "buyeo",
+    "name": "부여군"
+  },
+  "서천군": {
+    "city_id": "128250",
+    "slug": "seocheon",
+    "name": "서천군"
+  },
+  "서천": {
+    "city_id": "128250",
+    "slug": "seocheon",
+    "name": "서천군"
+  },
+  "청양군": {
+    "city_id": "128264",
+    "slug": "cheongyang",
+    "name": "청양군"
+  },
+  "청양": {
+    "city_id": "128264",
+    "slug": "cheongyang",
+    "name": "청양군"
+  },
+  "홍성군": {
+    "city_id": "128253",
+    "slug": "hongseong",
+    "name": "홍성군"
+  },
+  "홍성": {
+    "city_id": "128253",
+    "slug": "hongseong",
+    "name": "홍성군"
+  },
+  "예산군": {
+    "city_id": "79254",
+    "slug": "yesan",
+    "name": "예산군"
+  },
+  "예산": {
+    "city_id": "79254",
+    "slug": "yesan",
+    "name": "예산군"
+  },
+  "태안군": {
+    "city_id": "61670",
+    "slug": "taean",
+    "name": "태안군"
+  },
+  "태안": {
+    "city_id": "61670",
+    "slug": "taean",
+    "name": "태안군"
+  },
+  "전주": {
+    "city_id": "61380",
+    "slug": "jeonju",
+    "name": "전주"
+  },
+  "군산": {
+    "city_id": "7254",
+    "slug": "gunsan",
+    "name": "군산"
+  },
+  "익산": {
+    "city_id": "121661",
+    "slug": "iksan",
+    "name": "익산"
+  },
+  "정읍": {
+    "city_id": "90541",
+    "slug": "jeongeup",
+    "name": "정읍"
+  },
+  "남원": {
+    "city_id": "61500",
+    "slug": "namwon",
+    "name": "남원"
+  },
+  "김제": {
+    "city_id": "128249",
+    "slug": "gimje",
+    "name": "김제"
+  },
+  "완주군": {
+    "city_id": "61732",
+    "slug": "wanju",
+    "name": "완주군"
+  },
+  "완주": {
+    "city_id": "61732",
+    "slug": "wanju",
+    "name": "완주군"
+  },
+  "진안군": {
+    "city_id": "121710",
+    "slug": "jinan",
+    "name": "진안군"
+  },
+  "진안": {
+    "city_id": "121710",
+    "slug": "jinan",
+    "name": "진안군"
+  },
+  "무주군": {
+    "city_id": "79252",
+    "slug": "muju",
+    "name": "무주군"
+  },
+  "무주": {
+    "city_id": "79252",
+    "slug": "muju",
+    "name": "무주군"
+  },
+  "장수군": {
+    "city_id": "121737",
+    "slug": "jangsu",
+    "name": "장수군"
+  },
+  "장수": {
+    "city_id": "121737",
+    "slug": "jangsu",
+    "name": "장수군"
+  },
+  "임실군": {
+    "city_id": "128251",
+    "slug": "imsil",
+    "name": "임실군"
+  },
+  "임실": {
+    "city_id": "128251",
+    "slug": "imsil",
+    "name": "임실군"
+  },
+  "순창군": {
+    "city_id": "128255",
+    "slug": "sunchang",
+    "name": "순창군"
+  },
+  "순창": {
+    "city_id": "128255",
+    "slug": "sunchang",
+    "name": "순창군"
+  },
+  "고창군": {
+    "city_id": "90430",
+    "slug": "gochang",
+    "name": "고창군"
+  },
+  "고창": {
+    "city_id": "90430",
+    "slug": "gochang",
+    "name": "고창군"
+  },
+  "부안군": {
+    "city_id": "78911",
+    "slug": "buan",
+    "name": "부안군"
+  },
+  "부안": {
+    "city_id": "78911",
+    "slug": "buan",
+    "name": "부안군"
+  },
+  "목포": {
+    "city_id": "3986",
+    "slug": "mokpo",
+    "name": "목포"
+  },
+  "여수": {
+    "city_id": "4016",
+    "slug": "yeosu",
+    "name": "여수"
+  },
+  "순천": {
+    "city_id": "61663",
+    "slug": "suncheon",
+    "name": "순천"
+  },
+  "나주": {
+    "city_id": "93536",
+    "slug": "naju",
+    "name": "나주"
+  },
+  "광양": {
+    "city_id": "92459",
+    "slug": "gwangyang",
+    "name": "광양"
+  },
+  "담양군": {
+    "city_id": "88100",
+    "slug": "damyang",
+    "name": "담양군"
+  },
+  "담양": {
+    "city_id": "88100",
+    "slug": "damyang",
+    "name": "담양군"
+  },
+  "곡성군": {
+    "city_id": "128274",
+    "slug": "gokseong",
+    "name": "곡성군"
+  },
+  "곡성": {
+    "city_id": "128274",
+    "slug": "gokseong",
+    "name": "곡성군"
+  },
+  "구례군": {
+    "city_id": "7730",
+    "slug": "gurye",
+    "name": "구례군"
+  },
+  "구례": {
+    "city_id": "7730",
+    "slug": "gurye",
+    "name": "구례군"
+  },
+  "고흥군": {
+    "city_id": "121740",
+    "slug": "goheung",
+    "name": "고흥군"
+  },
+  "고흥": {
+    "city_id": "121740",
+    "slug": "goheung",
+    "name": "고흥군"
+  },
+  "보성군": {
+    "city_id": "72369",
+    "slug": "boseong",
+    "name": "보성군"
+  },
+  "보성": {
+    "city_id": "72369",
+    "slug": "boseong",
+    "name": "보성군"
+  },
+  "화순군": {
+    "city_id": "7729",
+    "slug": "hwasun",
+    "name": "화순군"
+  },
+  "화순": {
+    "city_id": "7729",
+    "slug": "hwasun",
+    "name": "화순군"
+  },
+  "장흥군": {
+    "city_id": "128246",
+    "slug": "jangheung",
+    "name": "장흥군"
+  },
+  "장흥": {
+    "city_id": "128246",
+    "slug": "jangheung",
+    "name": "장흥군"
+  },
+  "강진군": {
+    "city_id": "128258",
+    "slug": "gangjin",
+    "name": "강진군"
+  },
+  "강진": {
+    "city_id": "128258",
+    "slug": "gangjin",
+    "name": "강진군"
+  },
+  "해남군": {
+    "city_id": "121747",
+    "slug": "haenam",
+    "name": "해남군"
+  },
+  "해남": {
+    "city_id": "121747",
+    "slug": "haenam",
+    "name": "해남군"
+  },
+  "영암군": {
+    "city_id": "61750",
+    "slug": "yeongam",
+    "name": "영암군"
+  },
+  "영암": {
+    "city_id": "61750",
+    "slug": "yeongam",
+    "name": "영암군"
+  },
+  "무안군": {
+    "city_id": "4012",
+    "slug": "muan",
+    "name": "무안군"
+  },
+  "무안": {
+    "city_id": "4012",
+    "slug": "muan",
+    "name": "무안군"
+  },
+  "함평군": {
+    "city_id": "88098",
+    "slug": "hampyeong",
+    "name": "함평군"
+  },
+  "함평": {
+    "city_id": "88098",
+    "slug": "hampyeong",
+    "name": "함평군"
+  },
+  "영광군": {
+    "city_id": "128263",
+    "slug": "yeonggwang",
+    "name": "영광군"
+  },
+  "영광": {
+    "city_id": "128263",
+    "slug": "yeonggwang",
+    "name": "영광군"
+  },
+  "장성군": {
+    "city_id": "128265",
+    "slug": "jangseong",
+    "name": "장성군"
+  },
+  "장성": {
+    "city_id": "128265",
+    "slug": "jangseong",
+    "name": "장성군"
+  },
+  "완도군": {
+    "city_id": "88101",
+    "slug": "wando",
+    "name": "완도군"
+  },
+  "완도": {
+    "city_id": "88101",
+    "slug": "wando",
+    "name": "완도군"
+  },
+  "진도군": {
+    "city_id": "128271",
+    "slug": "jindo",
+    "name": "진도군"
+  },
+  "진도": {
+    "city_id": "128271",
+    "slug": "jindo",
+    "name": "진도군"
+  },
+  "신안군": {
+    "city_id": "128277",
+    "slug": "sinan",
+    "name": "신안군"
+  },
+  "신안": {
+    "city_id": "128277",
+    "slug": "sinan",
+    "name": "신안군"
+  },
+  "포항": {
+    "city_id": "3369",
+    "slug": "pohang",
+    "name": "포항"
+  },
+  "경주": {
+    "city_id": "3675",
+    "slug": "gyeongju",
+    "name": "경주"
+  },
+  "김천": {
+    "city_id": "61333",
+    "slug": "gimcheon",
+    "name": "김천"
+  },
+  "안동": {
+    "city_id": "61163",
+    "slug": "andong",
+    "name": "안동"
+  },
+  "구미": {
+    "city_id": "61350",
+    "slug": "gumi",
+    "name": "구미"
+  },
+  "영주": {
+    "city_id": "79258",
+    "slug": "yeongju",
+    "name": "영주"
+  },
+  "영천": {
+    "city_id": "93567",
+    "slug": "yeongcheon",
+    "name": "영천"
+  },
+  "상주": {
+    "city_id": "128257",
+    "slug": "sangju",
+    "name": "상주"
+  },
+  "문경": {
+    "city_id": "61491",
+    "slug": "mungyeong",
+    "name": "문경"
+  },
+  "경산": {
+    "city_id": "128267",
+    "slug": "gyeongsan",
+    "name": "경산"
+  },
+  "군위군": {
+    "city_id": "128266",
+    "slug": "gunwi",
+    "name": "군위군"
+  },
+  "군위": {
+    "city_id": "128266",
+    "slug": "gunwi",
+    "name": "군위군"
+  },
+  "의성군": {
+    "city_id": "128270",
+    "slug": "uiseong",
+    "name": "의성군"
+  },
+  "의성": {
+    "city_id": "128270",
+    "slug": "uiseong",
+    "name": "의성군"
+  },
+  "청송군": {
+    "city_id": "79255",
+    "slug": "cheongsong",
+    "name": "청송군"
+  },
+  "청송": {
+    "city_id": "79255",
+    "slug": "cheongsong",
+    "name": "청송군"
+  },
+  "영양군": {
+    "city_id": "128256",
+    "slug": "yeongyang",
+    "name": "영양군"
+  },
+  "영양": {
+    "city_id": "128256",
+    "slug": "yeongyang",
+    "name": "영양군"
+  },
+  "예천군": {
+    "city_id": "6370",
+    "slug": "yecheon",
+    "name": "예천군"
+  },
+  "예천": {
+    "city_id": "6370",
+    "slug": "yecheon",
+    "name": "예천군"
+  },
+  "봉화군": {
+    "city_id": "92584",
+    "slug": "bonghwa",
+    "name": "봉화군"
+  },
+  "봉화": {
+    "city_id": "92584",
+    "slug": "bonghwa",
+    "name": "봉화군"
+  },
+  "울진군": {
+    "city_id": "61719",
+    "slug": "uljin",
+    "name": "울진군"
+  },
+  "울진": {
+    "city_id": "61719",
+    "slug": "uljin",
+    "name": "울진군"
+  },
+  "울릉군": {
+    "city_id": "128254",
+    "slug": "ulleung",
+    "name": "울릉군"
+  },
+  "울릉": {
+    "city_id": "128254",
+    "slug": "ulleung",
+    "name": "울릉군"
+  },
+  "칠곡": {
+    "city_id": "128260",
+    "slug": "chilgok",
+    "name": "칠곡"
+  },
+  "영덕": {
+    "city_id": "92587",
+    "slug": "yeongdeok",
+    "name": "영덕"
+  },
+  "창원": {
+    "city_id": "35787",
+    "slug": "changwon",
+    "name": "창원"
+  },
+  "김해": {
+    "city_id": "61334",
+    "slug": "gimhae",
+    "name": "김해"
+  },
+  "진주": {
+    "city_id": "6908",
+    "slug": "jinju",
+    "name": "진주"
+  },
+  "통영": {
+    "city_id": "72366",
+    "slug": "tongyeong",
+    "name": "통영"
+  },
+  "사천": {
+    "city_id": "79259",
+    "slug": "sacheon",
+    "name": "사천"
+  },
+  "밀양": {
+    "city_id": "93539",
+    "slug": "miryang",
+    "name": "밀양"
+  },
+  "거제": {
+    "city_id": "61331",
+    "slug": "geoje",
+    "name": "거제"
+  },
+  "양산": {
+    "city_id": "79364",
+    "slug": "yangsan",
+    "name": "양산"
+  },
+  "의령군": {
+    "city_id": "128275",
+    "slug": "uiryeong",
+    "name": "의령군"
+  },
+  "의령": {
+    "city_id": "128275",
+    "slug": "uiryeong",
+    "name": "의령군"
+  },
+  "함안군": {
+    "city_id": "128259",
+    "slug": "haman",
+    "name": "함안군"
+  },
+  "함안": {
+    "city_id": "128259",
+    "slug": "haman",
+    "name": "함안군"
+  },
+  "창녕군": {
+    "city_id": "61271",
+    "slug": "changnyeong",
+    "name": "창녕군"
+  },
+  "창녕": {
+    "city_id": "61271",
+    "slug": "changnyeong",
+    "name": "창녕군"
+  },
+  "경남고성군": {
+    "city_id": "78903",
+    "slug": "goseong-gyeongnam",
+    "name": "경남고성군"
+  },
+  "경남고성": {
+    "city_id": "78903",
+    "slug": "goseong-gyeongnam",
+    "name": "경남고성군"
+  },
+  "남해군": {
+    "city_id": "20818",
+    "slug": "namhae",
+    "name": "남해군"
+  },
+  "남해": {
+    "city_id": "20818",
+    "slug": "namhae",
+    "name": "남해군"
+  },
+  "하동군": {
+    "city_id": "88097",
+    "slug": "hadong",
+    "name": "하동군"
+  },
+  "하동": {
+    "city_id": "88097",
+    "slug": "hadong",
+    "name": "하동군"
+  },
+  "산청군": {
+    "city_id": "61615",
+    "slug": "sancheong",
+    "name": "산청군"
+  },
+  "산청": {
+    "city_id": "61615",
+    "slug": "sancheong",
+    "name": "산청군"
+  },
+  "함양군": {
+    "city_id": "92583",
+    "slug": "hamyang",
+    "name": "함양군"
+  },
+  "함양": {
+    "city_id": "92583",
+    "slug": "hamyang",
+    "name": "함양군"
+  },
+  "거창군": {
+    "city_id": "92582",
+    "slug": "geochang",
+    "name": "거창군"
+  },
+  "거창": {
+    "city_id": "92582",
+    "slug": "geochang",
+    "name": "거창군"
+  },
+  "합천군": {
+    "city_id": "77790",
+    "slug": "hapcheon",
+    "name": "합천군"
+  },
+  "합천": {
+    "city_id": "77790",
+    "slug": "hapcheon",
+    "name": "합천군"
+  },
+  "청도군": {
+    "city_id": "128261",
+    "slug": "cheongdo",
+    "name": "청도군"
+  },
+  "청도": {
+    "city_id": "128261",
+    "slug": "cheongdo",
+    "name": "청도군"
+  },
+  "서귀포": {
+    "city_id": "35796",
+    "slug": "seogwipo",
+    "name": "서귀포"
+  },
+  "성주군": {
+    "city_id": "79257",
+    "slug": "seongju",
+    "name": "성주군"
+  },
+  "성주": {
+    "city_id": "79257",
+    "slug": "seongju",
+    "name": "성주군"
+  }
+}
