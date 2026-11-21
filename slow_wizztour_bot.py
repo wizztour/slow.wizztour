@@ -254,22 +254,42 @@ def load_region_affiliate_links() -> dict:
 AFFILIATE_LINKS = load_region_affiliate_links()
 
 
+_SLOW_TRIPCOM_CITY_IDS = {
+    "서울": "274",
+    "부산": "253",
+    "제주": "737",
+    "제주시": "737",
+    "서귀포": "35796",
+    "인천": "410",
+    "포항": "3369",
+}
+
+
 def _append_tripcom_affiliate_params(url: str) -> str:
-    """트립닷컴 일반 URL에 직접 제휴 추적 파라미터(Allianceid, SID, trip_sub1)를 안전하게 부착합니다."""
+    """트립닷컴 일반 URL에 직접 제휴 추적 파라미터(allianceid, sid, trip_sub1)를 안전하게 부착합니다."""
     if not url or "3ha.in" in url or "allianceid=" in url.lower():
         return url
     sep = "&" if "?" in url else "?"
-    return f"{url}{sep}Allianceid={TRIPCOM_ALLIANCE_ID}&SID={TRIPCOM_SID}&trip_sub1=slow_wizztour"
+    extra = ""
+    if "curr=" not in url.lower():
+        extra += "&curr=KRW&locale=ko-KR"
+    return f"{url}{sep}allianceid={TRIPCOM_ALLIANCE_ID}&sid={TRIPCOM_SID}&trip_sub1=slow_wizztour{extra}"
 
 
 def resolve_hotel_affiliate_url(city: str, province: str = "", custom_keyword: str = "") -> str:
-    kw = (custom_keyword or city or province or "한국").strip()
+    city_clean = (city or "").strip()
+    city_id = _SLOW_TRIPCOM_CITY_IDS.get(city_clean) or _SLOW_TRIPCOM_CITY_IDS.get((province or "").strip())
+    kw = (custom_keyword or city_clean or province or "한국").strip()
     if custom_keyword:
-        return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
+        if city_id and custom_keyword == city_clean:
+            return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?cityId={city_id}&countryId=42")
+        return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(city_clean or kw)}")
     h_map = AFFILIATE_LINKS.get("hotel") or {}
     for key in (city, province):
         if key and h_map.get(key):
             return _append_tripcom_affiliate_params(h_map[key])
+    if city_id:
+        return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?cityId={city_id}&countryId=42")
     return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
 
 
