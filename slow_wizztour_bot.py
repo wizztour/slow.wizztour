@@ -31,6 +31,8 @@ import os
 import re
 import json
 import time
+import hmac
+import hashlib
 import random
 import argparse
 from datetime import datetime, timezone, timedelta
@@ -56,6 +58,8 @@ AD_SLOT_TOP = "3911475090"     # slow 상단
 AD_SLOT_MID = "6591102613"     # slow 중간
 AD_SLOT_BOTTOM = "5109006694"  # slow 하단
 COUPANG_AF_ID = os.environ.get("COUPANG_AF_ID") or "AF2307983"
+COUPANG_ACCESS_KEY = os.environ.get("COUPANG_ACCESS_KEY") or ""
+COUPANG_SECRET_KEY = os.environ.get("COUPANG_SECRET_KEY") or ""
 TRIPCOM_ALLIANCE_ID = os.environ.get("TRIPCOM_ALLIANCE_ID") or "6574450"
 TRIPCOM_SID = os.environ.get("TRIPCOM_SID") or "336748469"
 SERVICE_KEY = os.environ.get("TOUR_API_KEY") or os.environ.get("PUBLIC_DATA_API_KEY") or ""
@@ -258,12 +262,14 @@ def _append_tripcom_affiliate_params(url: str) -> str:
     return f"{url}{sep}Allianceid={TRIPCOM_ALLIANCE_ID}&SID={TRIPCOM_SID}&trip_sub1=slow_wizztour"
 
 
-def resolve_hotel_affiliate_url(city: str, province: str = "") -> str:
+def resolve_hotel_affiliate_url(city: str, province: str = "", custom_keyword: str = "") -> str:
+    kw = (custom_keyword or city or province or "한국").strip()
+    if custom_keyword:
+        return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
     h_map = AFFILIATE_LINKS.get("hotel") or {}
     for key in (city, province):
         if key and h_map.get(key):
             return _append_tripcom_affiliate_params(h_map[key])
-    kw = (city or province or "한국").strip()
     return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
 
 
@@ -765,26 +771,114 @@ def make_slow_flat_route_html(title: str, city: str, flat_route: list) -> str:
 """.strip()
 
 
-def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_date_str: str, province: str = "") -> str:
+_SLOW_FAMOUS_ZONES = (
+    "보문", "경포", "중문", "함덕", "애월", "협재", "해운대", "광안리", "송도",
+    "영일대", "한옥마을", "불국사", "첨성대", "월포", "대천", "변산", "여수엑스포",
+    "남이섬", "대부도", "월미도", "정동진", "속초해변", "강문", "안목", "전곡항",
+)
+
+
+def extract_nearby_subarea(dest: dict) -> tuple:
+    """명소의 주소·제목에서 인접 구·권역 키워드와 표시 라벨을 추출합니다."""
+    if not dest:
+        return "", ""
+    title = str(dest.get("title") or "")
+    addr = str(dest.get("addr") or "")
+    city = str(dest.get("city") or "").strip()
+    for z in _SLOW_FAMOUS_ZONES:
+        if z in title or z in addr:
+            return f"{city} {z}".strip(), f"{city} {z} 권역".strip()
+    tokens = addr.split()
+    for tok in tokens[1:4]:
+        clean = tok.strip("(),")
+        if clean.endswith("구") and len(clean) >= 2 and clean != city:
+            return f"{city} {clean}".strip(), f"{city} {clean} 권역".strip()
+    return city, f"{city} 인접 중심권".strip()
+
+
+def fetch_kto_stays_for_slow(city: str, subarea_kw: str = "", limit: int = 3) -> list:
+    """한국관광공사 KorService2(contentTypeId=32)에서 공식 이미지가 있는 인근 숙소를 조회합니다."""
+    if not SERVICE_KEY or not city:
+        return []
+    queries = [q for q in (subarea_kw, city) if q]
+    seen_cid = set()
+    stays = []
+    for q in queries:
+        try:
+            r = requests.get(
+                "https://apis.data.go.kr/B551011/KorService2/searchKeyword2",
+                params={
+                    "serviceKey": unquote(SERVICE_KEY),
+                    "MobileOS": "ETC",
+                    "MobileApp": "WizzTourSlow",
+                    "_type": "json",
+                    "contentTypeId": "32",
+                    "keyword": q,
+                    "numOfRows": 15,
+                    "pageNo": 1,
+                },
+                timeout=8,
+                verify=False,
+            )
+            if r.status_code != 200:
+                continue
+            items = (((r.json().get("response") or {}).get("body") or {}).get("items") or {}).get("item", [])
+            if isinstance(items, dict):
+                items = [items]
+            for it in (items or []):
+                cid = str(it.get("contentid") or "")
+                t = str(it.get("title") or "").strip()
+                img = str(it.get("firstimage") or it.get("firstimage2") or "").strip().replace("http://", "https://")
+                if not cid or cid in seen_cid or not t or not img:
+                    continue
+                seen_cid.add(cid)
+                stays.append({
+                    "title": t,
+                    "addr": str(it.get("addr1") or "").strip(),
+                    "image": img,
+                    "url": resolve_hotel_affiliate_url(city, custom_keyword=t),
+                })
+                if len(stays) >= limit:
+                    return stays
+        except Exception:
+            continue
+    return stays
+
+
+def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_date_str: str, province: str = "", dest: dict = None) -> str:
     """
-    [판매 상위 1%의 노하우 - STEP 3 & STEP 6 완벽 반영 + 세시간전(3ha.in) 구글 시트 연동]
-    - 확인 시점 명시 (YYYY년 MM월 DD일 확인 기준)
-    - 비교 기준 명시 (장애인 전용 객실·엘리베이터·출입구 단차·1층 조식 동선·무료취소)
-    - 3단 비교표 + 구체적 행동 유도('내 날짜 무장애·효도 객실 요금 예약하기')
+    [판매 상위 1%의 노하우 - STEP 3 & STEP 6 + 트립닷컴(Allianceid=6574450, SID=336748469) 근거리·권역 세분화]
+    - 확인 시점 명시 + 근거리/권역/목적별 맞춤 트립닷컴 검색 링크 분기
+    - KTO 공식 숙박 사진(hotel_cards) 캐시 보유 시 실존 호텔 카드 함께 노출
     """
     tripcom_url = resolve_hotel_affiliate_url(city, province)
+    subarea_kw, subarea_label = extract_nearby_subarea(dest or {"title": title, "city": city})
+    zone_keywords = [
+        subarea_kw or city,
+        f"{city} 리조트" if city else "",
+        f"{city} 호텔" if city else "",
+    ]
     tbody_rows = ""
     btn_colors = ["#0f766e", "#2563eb", "#ea580c"]
-    btn_labels = ["장애인객실·특급호텔 요금 예약하기", "부모님·가족 리조트 조건 확인·예약", "무료취소 가능 가성비 호텔 예약하기"]
+    btn_labels = [
+        f"{subarea_label or city} 인접 호텔 보기",
+        f"{city} 가족 리조트·콘도 보기",
+        f"{city} 역세권·가성비 호텔 보기",
+    ]
 
     for i, h in enumerate(hotels[:3]):
         bg = "#ffffff" if i % 2 == 0 else "#f8fafc"
         color = btn_colors[i % len(btn_colors)]
         b_label = btn_labels[i % len(btn_labels)]
+        row_kw = zone_keywords[i] if i < len(zone_keywords) else city
+        row_url = resolve_hotel_affiliate_url(city, province, custom_keyword=row_kw)
+        type_txt = h.get("type", "")
+        if i == 0 and subarea_label and subarea_kw != city:
+            type_txt = f"① {subarea_label} 인접 무장애·특급 호텔"
         tbody_rows += f"""
         <tr style="background:{bg};">
           <td style="padding:11px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f172a;">
-            {escape(h.get('type', ''))}<br>
+            {escape(type_txt)}<br>
             <span style="font-size:12.5px; color:#0f766e;">({escape(h.get('name', ''))})</span>
           </td>
           <td style="padding:11px 12px; border:1px solid #e2e8f0; color:#334155;">
@@ -794,19 +888,53 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
             체크인 날짜별 잔여 객실 · 조식 포함 · 무료취소 기한 사전 확인 권장
           </td>
           <td style="padding:11px 12px; border:1px solid #e2e8f0; text-align:center;">
-            <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+            <a href="{escape(row_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
                style="display:inline-block; background:{color}; color:#ffffff !important; font-weight:700; font-size:12.5px; padding:8px 12px; border-radius:8px; text-decoration:none;">
-              {b_label}
+              {escape(b_label)} →
             </a>
           </td>
         </tr>
         """.strip()
 
+    stay_cards_html = ""
+    hotel_cards = (dest or {}).get("hotel_cards") or []
+    if hotel_cards:
+        hc_items = ""
+        for hc in hotel_cards[:3]:
+            hc_title = str(hc.get("title") or "")
+            hc_img = str(hc.get("image") or "").replace("http://", "https://")
+            hc_addr = str(hc.get("addr") or city)
+            hc_url = resolve_hotel_affiliate_url(city, province, custom_keyword=hc_title)
+            img_tag = f'<img src="{escape(hc_img)}" alt="{escape(hc_title)}" loading="lazy" style="width:100%; height:136px; object-fit:cover; display:block;">' if hc_img else ""
+            hc_items += f"""
+        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; overflow:hidden; display:flex; flex-direction:column;">
+          {img_tag}
+          <div style="padding:11px 12px; display:flex; flex-direction:column; gap:5px; flex:1;">
+            <span style="font-size:11px; color:#0f766e; font-weight:800;">📍 {escape(hc_addr[:26])}</span>
+            <div style="font-size:14.5px; font-weight:800; color:#0f172a; line-height:1.35;">{escape(hc_title)}</div>
+            <a href="{escape(hc_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+               style="margin-top:auto; display:block; text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:12.5px; padding:8px 10px; border-radius:8px; text-decoration:none;">
+              🏨 객실·최저가 확인 →
+            </a>
+          </div>
+        </div>
+            """.strip()
+        stay_cards_html = f"""
+  <div style="margin:14px 0 16px 0;">
+    <div style="font-size:14.5px; font-weight:800; color:#0f172a; margin-bottom:10px;">
+      🏨 {escape(title)} 주변 실존 추천 숙소 (공식 사진 · 트립닷컴 직결)
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(215px, 1fr)); gap:10px;">
+      {hc_items}
+    </div>
+  </div>
+""".strip()
+
     return f"""
 <section id="slow-hotel-comparison" style="margin:30px 0; padding:22px 20px; background:#ffffff; border:2px solid #0f766e; border-radius:16px; box-shadow:0 6px 18px rgba(15,118,110,0.08);">
   <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; border-bottom:2px solid #f1f5f9; padding-bottom:10px; margin-bottom:12px;">
     <h2 style="margin:0; font-size:20px; color:#0f172a; font-weight:800;">
-      🏨 {escape(city)} 무장애·부모님 효도·유모차 동반 숙소 조건 비교표
+      🏨 {escape(subarea_label or city)} 무장애·부모님 효도·유모차 숙소 권역 비교표
     </h2>
     <span style="font-size:12.5px; color:#475569; background:#f8fafc; padding:4px 10px; border-radius:999px; border:1px solid #e2e8f0;">
       📅 정보·조건 확인 시점: {escape(check_date_str)} 확인 기준
@@ -826,7 +954,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
           <th style="padding:11px 12px; border:1px solid #334155;">숙소 유형 &amp; 추천 권역</th>
           <th style="padding:11px 12px; border:1px solid #334155;">무장애·효도·유모차 핵심 강점 (1순위 기준)</th>
           <th style="padding:11px 12px; border:1px solid #334155;">예약 전 필수 체크 조건</th>
-          <th style="padding:11px 12px; border:1px solid #334155; text-align:center;">요금 확인 &amp; 예약</th>
+          <th style="padding:11px 12px; border:1px solid #334155; text-align:center;">권역별 요금 확인</th>
         </tr>
       </thead>
       <tbody>
@@ -834,6 +962,8 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
       </tbody>
     </table>
   </div>
+
+  {stay_cards_html}
 
   <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px; font-size:13.2px; color:#78350f; margin:10px 0 16px 0; line-height:1.6;">
     💡 <strong>왜 앱에서 처음부터 검색하는 것보다 위 무장애 비교표가 유리한가요? ({escape(check_date_str)} 확인 기준)</strong><br>
@@ -843,9 +973,9 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
   </div>
 
   <div style="text-align:center;">
-    <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+    <a href="{escape(tripcom_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="display:inline-block; background:linear-gradient(135deg, #0f766e 0%, #0d9488 100%); color:#ffffff !important; font-size:15.5px; font-weight:800; padding:13px 28px; border-radius:999px; text-decoration:none; box-shadow:0 4px 14px rgba(15,118,110,0.3);">
-      👉 [{escape(city)}] 내 여행 날짜에 맞는 무장애·효도 호텔 객실 요금 예약하기
+      👉 [{escape(subarea_label or city)}] 무장애·효도 호텔 객실 요금 전체 비교하기
     </a>
   </div>
 </section>
@@ -1018,10 +1148,76 @@ def make_quick_spec_table_html(dest: dict, bf: dict) -> str:
 """.strip()
 
 
+COUPANG_PRODUCTS_CACHE_FILE = os.path.join(DATA_DIR, "coupang_products_cache.json")
+
+
+def _load_coupang_products_cache() -> dict:
+    if os.path.exists(COUPANG_PRODUCTS_CACHE_FILE):
+        try:
+            with open(COUPANG_PRODUCTS_CACHE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+        except Exception:
+            pass
+    return {}
+
+
+_COUPANG_PRODUCTS_CACHE = _load_coupang_products_cache()
+
+
+def fetch_coupang_api_product(keyword: str) -> dict:
+    """
+    [쿠팡 파트너스 Open API /products/search 연동]
+    COUPANG_ACCESS_KEY & COUPANG_SECRET_KEY 설정 시 실상품 이미지·가격·로켓배송·제휴 딥링크를 조회하고
+    data/coupang_products_cache.json에 캐싱합니다.
+    """
+    kw = (keyword or "").strip()
+    if not kw:
+        return {}
+    if kw in _COUPANG_PRODUCTS_CACHE and _COUPANG_PRODUCTS_CACHE[kw].get("productImage"):
+        return _COUPANG_PRODUCTS_CACHE[kw]
+    if not COUPANG_ACCESS_KEY or not COUPANG_SECRET_KEY:
+        return {}
+
+    path = "/v2/providers/affiliate_open_api/apis/openapi/v1/products/search"
+    query = f"keyword={quote(kw)}&limit=1"
+    datetime_gmt = time.strftime("%y%m%d", time.gmtime()) + "T" + time.strftime("%H%M%S", time.gmtime()) + "Z"
+    message = f"{datetime_gmt}GET{path}{query}"
+    signature = hmac.new(
+        COUPANG_SECRET_KEY.encode("utf-8"),
+        message.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    auth = f"CEA algorithm=HmacSHA256, access-key={COUPANG_ACCESS_KEY}, signed-date={datetime_gmt}, signature={signature}"
+    try:
+        r = requests.get(
+            f"https://api-gateway.coupang.com{path}?{query}",
+            headers={"Authorization": auth, "Content-Type": "application/json;charset=UTF-8"},
+            timeout=8,
+        )
+        if r.status_code == 200:
+            items = (r.json().get("data") or {}).get("productData") or []
+            if items and isinstance(items, list):
+                top = items[0]
+                item = {
+                    "productName": str(top.get("productName") or kw),
+                    "productPrice": int(top.get("productPrice") or 0),
+                    "productImage": str(top.get("productImage") or "").replace("http://", "https://"),
+                    "productUrl": str(top.get("productUrl") or make_coupang_affsrp_url(kw)),
+                    "isRocket": bool(top.get("isRocket")),
+                }
+                _COUPANG_PRODUCTS_CACHE[kw] = item
+                return item
+    except Exception as e:
+        print(f"[쿠팡 Open API 참고] {kw}: {e}")
+    return {}
+
+
 def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
     """
     [슬림형 결핍 해결형 쿠팡 파트너스 바]
-    스펙표 바로 아래 시야를 가리지 않도록 핵심 준비물 2종 링크와 대가성 문구만 간결하게 배치합니다.
+    쿠팡 Open API 캐시(COUPANG_ACCESS_KEY)가 있으면 실제 상품 썸네일·가격·로켓배지를 표시하고,
+    미설정 시에는 핵심 준비물 2종 AFFSRP 링크 버튼을 간결하게 배치합니다.
     """
     ctid = str(dest.get("contentTypeId") or "12")
     has_wheelchair_rental = _bf_ok(bf, "wheelchair")
@@ -1050,14 +1246,32 @@ def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
 
     btns_html = ""
     for label, kw, color in products:
-        c_url = make_coupang_affsrp_url(kw)
-        btns_html += (
-            f'<a href="{escape(c_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
-            f'style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;">'
-            f'<span>{label}</span>'
-            f'<span style="background:{color}; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span>'
-            f'</a>'
-        )
+        api_item = _COUPANG_PRODUCTS_CACHE.get(kw) or {}
+        p_img = str(api_item.get("productImage") or "").strip()
+        p_url = str(api_item.get("productUrl") or make_coupang_affsrp_url(kw))
+        p_price = int(api_item.get("productPrice") or 0)
+        if p_img:
+            rocket_badge = '<span style="background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:1px 6px; border-radius:4px;">로켓배송</span> ' if api_item.get("isRocket") else ""
+            price_txt = f'<div style="font-size:13px; font-weight:800; color:#dc2626;">{rocket_badge}{p_price:,}원</div>' if p_price > 0 else ""
+            btns_html += (
+                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
+                f'style="display:flex; align-items:center; gap:10px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:8px 10px; text-decoration:none; color:#0f172a;">'
+                f'<img src="{escape(p_img)}" alt="{escape(kw)}" loading="lazy" style="width:54px; height:54px; object-fit:cover; border-radius:8px; flex-shrink:0; border:1px solid #f1f5f9;">'
+                f'<div style="min-width:0; flex:1;">'
+                f'<div style="font-size:12.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{escape(label)}</div>'
+                f'{price_txt}'
+                f'</div>'
+                f'<span style="background:{color}; color:#ffffff; font-size:11.5px; font-weight:800; padding:5px 9px; border-radius:999px; white-space:nowrap;">최저가 →</span>'
+                f'</a>'
+            )
+        else:
+            btns_html += (
+                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
+                f'style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;">'
+                f'<span>{label}</span>'
+                f'<span style="background:{color}; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span>'
+                f'</a>'
+            )
 
     return f"""
 <section id="coupang-care-gear" style="margin:16px 0 20px 0; padding:12px 14px; background:#fff7ed; border:1px solid #fdba74; border-radius:12px;">
@@ -1158,7 +1372,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
     crowd_food_html = make_crowd_and_food_care_box_html(dest, allow_live_api=is_live_refresh)
     overview_html = generate_slow_persuasion_overview(dest, spot_check_date, allow_ai=is_live_refresh)
     flat_route_html = make_slow_flat_route_html(title, city, dest.get("flat_route") or [])
-    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], spot_check_date, province=province)
+    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], spot_check_date, province=province, dest=dest)
     usim_tour_html = make_usim_and_tour_affiliate_box_html(city)
     related_html = make_related_spots_html(dest, all_destinations or [])
 
@@ -1285,8 +1499,8 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
     <article class="card">
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;">{tags_html}</div>
       <h1>{escape(seo_title)}</h1>
-      <div style="background:#fffbeb; border:2px solid #f59e0b; border-radius:10px; padding:12px 15px; margin:0 0 14px 0; font-size:14.5px; color:#0f172a; font-weight:700; line-height:1.55;">
-        📢 세시간전 크리에이터 활동을 통해 수익이 발생하는 링크가 포함되어 있습니다. 해당 링크를 통해 상품을 구매할 경우 수수료가 지급됩니다.
+      <div style="background:#fffbeb; border:2px solid #f59e0b; border-radius:10px; padding:12px 15px; margin:0 0 14px 0; font-size:14px; color:#0f172a; font-weight:700; line-height:1.55;">
+        📢 이 글에는 트립닷컴 파트너스·세시간전·쿠팡 파트너스 등 제휴 마케팅 활동의 일환으로 수수료가 발생하는 링크가 포함되어 있으며, 예약·구매 시 일정액의 수수료가 지급됩니다. (추가 비용 없음)
       </div>
       <p style="font-size:13.5px; color:#64748b; margin:0 0 16px 0;">
         📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(spot_check_date)} (한국관광공사 열린관광·KorWithService2·집중률 API 기준)
@@ -2052,10 +2266,44 @@ def refresh_oldest_destinations(destinations: list, now_dt: datetime, check_date
         if live_crowd.get("live_cnctr_rate"):
             d.setdefault("crowd_prediction", {})["weekday_score"] = live_crowd["live_cnctr_rate"]
 
+        if not d.get("hotel_cards"):
+            sub_kw, _ = extract_nearby_subarea(d)
+            stays = fetch_kto_stays_for_slow(d.get("city", ""), subarea_kw=sub_kw, limit=3)
+            if stays:
+                d["hotel_cards"] = stays
+
         d["updated_at"] = now_iso
         d["checked_date"] = check_date_str
         refreshed_ids.add(cid)
     return refreshed_ids
+
+
+def refresh_coupang_products_cache():
+    """COUPANG_ACCESS_KEY / COUPANG_SECRET_KEY 설정 시 7대 핵심 무장애·가족 준비물 이미지/가격을 API로 1회 캐싱합니다."""
+    if not COUPANG_ACCESS_KEY or not COUPANG_SECRET_KEY:
+        return
+    core_kws = [
+        "초경량 접이식 휴대용 휠체어",
+        "지팡이 접이식 의자",
+        "초경량 기내반입 휴대용 유모차",
+        "유모차 방풍커버 햇빛가리개",
+        "휴대용 젖병 보온 파우치",
+        "욕실 미끄럼방지 안전매트",
+        "여행용 경추베개",
+    ]
+    updated = False
+    for kw in core_kws:
+        if kw not in _COUPANG_PRODUCTS_CACHE or not _COUPANG_PRODUCTS_CACHE[kw].get("productImage"):
+            if fetch_coupang_api_product(kw):
+                updated = True
+            time.sleep(0.25)
+    if updated:
+        try:
+            with open(COUPANG_PRODUCTS_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(_COUPANG_PRODUCTS_CACHE, f, ensure_ascii=False, indent=2)
+            print(f"🛒 [쿠팡 Open API 상품 이미지 캐시 갱신] {len(_COUPANG_PRODUCTS_CACHE)}종")
+        except Exception:
+            pass
 
 
 def main():
@@ -2063,6 +2311,8 @@ def main():
     parser.add_argument("--build-once", action="store_true", help="증분 정적 사이트 빌드 실행")
     parser.add_argument("--force-all", action="store_true", help="모든 상세 HTML을 강제 재생성")
     args = parser.parse_args()
+
+    refresh_coupang_products_cache()
 
     now_dt = datetime.now(KST)
     now_iso = now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")

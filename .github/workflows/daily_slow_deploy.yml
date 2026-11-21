@@ -36,6 +36,10 @@ jobs:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           USIMSA_AFFILIATE_URL: ${{ secrets.USIMSA_AFFILIATE_URL }}
           KLOOK_AFFILIATE_URL: ${{ secrets.KLOOK_AFFILIATE_URL }}
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          TRIPCOM_ALLIANCE_ID: ${{ secrets.TRIPCOM_ALLIANCE_ID }}
+          TRIPCOM_SID: ${{ secrets.TRIPCOM_SID }}
         run: |
           python slow_wizztour_bot.py --build-once
 
