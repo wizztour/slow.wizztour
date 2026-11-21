@@ -44,12 +44,17 @@
     .top-nav { background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
     .top-nav a { color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }
     .container { max-width:1040px; margin:0 auto; padding:26px 18px 60px; }
-    .spot-row { cursor:pointer; transition:background 0.15s ease; }
+    .spot-row { cursor:pointer; transition:background 0.18s ease; }
     .spot-row:hover { background:#f0fdfa !important; }
-    .spot-link { display:flex; justify-content:space-between; align-items:center; gap:8px; color:#0f172a; font-weight:800; text-decoration:none; }
-    .spot-row:hover .spot-link { color:#0f766e; }
-    .spot-cta { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:6px; white-space:nowrap; text-decoration:none; flex-shrink:0; transition:all 0.15s ease; }
-    .spot-row:hover .spot-cta { background:#0f766e; color:#ffffff; border-color:#0f766e; }
+    .spot-link { display:flex; justify-content:space-between; align-items:center; gap:10px; color:#0f172a; font-weight:700; text-decoration:none; }
+    .spot-title { position:relative; display:inline-block; color:#0f172a; font-weight:700; transition:color 0.18s ease, transform 0.18s ease; }
+    .spot-title::after { content:''; position:absolute; left:0; bottom:-2px; width:100%; height:2px; background:#0f766e; border-radius:2px; transform:scaleX(0); transform-origin:left center; transition:transform 0.2s ease; }
+    .spot-row:hover .spot-title { color:#0f766e; transform:translateX(2px); }
+    .spot-row:hover .spot-title::after { transform:scaleX(1); }
+    .spot-cta { display:inline-flex; align-items:center; gap:4px; background:linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%); color:#0f766e; border:1px solid #99f6e4; font-size:12px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; box-shadow:0 1px 2px rgba(15, 118, 110, 0.08); transition:all 0.18s ease; }
+    .spot-arrow { display:inline-block; font-size:13px; line-height:1; transition:transform 0.18s ease; }
+    .spot-row:hover .spot-cta { background:linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color:#ffffff; border-color:#0f766e; box-shadow:0 3px 10px rgba(15, 118, 110, 0.25); transform:translateY(-1px); }
+    .spot-row:hover .spot-arrow { transform:translateX(3px); }
   </style>
 </head>
 <body>
@@ -101,8 +106,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/jeju-jeolmul-forest-barrier-free.html" class="spot-link">
-              <span>제주 절물자연휴양림 무장애 나눔길 &amp; 서귀포 치유의숲 평지 코스</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주 절물자연휴양림 무장애 나눔길 &amp; 서귀포 치유의숲 평지 코스</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -114,8 +119,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2949573-barrier-free.html" class="spot-link">
-              <span>제주문학관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주문학관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -127,8 +132,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-597562-barrier-free.html" class="spot-link">
-              <span>제주현대미술관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주현대미술관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -140,8 +145,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2031663-barrier-free.html" class="spot-link">
-              <span>김만덕기념관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">김만덕기념관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -153,8 +158,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-741109-barrier-free.html" class="spot-link">
-              <span>카멜리아힐</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">카멜리아힐</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -166,8 +171,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-590415-barrier-free.html" class="spot-link">
-              <span>감귤박물관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">감귤박물관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -179,8 +184,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2472824-barrier-free.html" class="spot-link">
-              <span>넥슨뮤지엄</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">넥슨뮤지엄</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -192,8 +197,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-130857-barrier-free.html" class="spot-link">
-              <span>제주해녀박물관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주해녀박물관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -205,8 +210,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-600584-barrier-free.html" class="spot-link">
-              <span>금호리조트 제주아쿠아나</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">금호리조트 제주아쿠아나</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -218,8 +223,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-598187-barrier-free.html" class="spot-link">
-              <span>선녀와나무꾼</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">선녀와나무꾼</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -231,8 +236,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-1769266-barrier-free.html" class="spot-link">
-              <span>제주 세계자연유산센터</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주 세계자연유산센터</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -244,8 +249,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3371999-barrier-free.html" class="spot-link">
-              <span>제주동화마을</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주동화마을</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -257,8 +262,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-130308-barrier-free.html" class="spot-link">
-              <span>제주항일기념관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주항일기념관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -270,8 +275,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-1939078-barrier-free.html" class="spot-link">
-              <span>조천읍도서관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">조천읍도서관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -283,8 +288,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-696841-barrier-free.html" class="spot-link">
-              <span>테디베어하우스 테지움</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">테디베어하우스 테지움</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -296,8 +301,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126455-barrier-free.html" class="spot-link">
-              <span>한림공원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">한림공원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -309,8 +314,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126460-barrier-free.html" class="spot-link">
-              <span>관덕정(제주)</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">관덕정(제주)</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -322,8 +327,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-745449-barrier-free.html" class="spot-link">
-              <span>다희연</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">다희연</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -335,8 +340,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-665594-barrier-free.html" class="spot-link">
-              <span>더마파크</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">더마파크</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -348,8 +353,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-125445-barrier-free.html" class="spot-link">
-              <span>생각하는 정원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">생각하는 정원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -361,8 +366,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-987913-barrier-free.html" class="spot-link">
-              <span>점보빌리지</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">점보빌리지</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -374,8 +379,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-879234-barrier-free.html" class="spot-link">
-              <span>새연교</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">새연교</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -387,8 +392,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-596964-barrier-free.html" class="spot-link">
-              <span>세계자동차&amp;피아노 박물관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">세계자동차&amp;피아노 박물관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -400,8 +405,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126672-barrier-free.html" class="spot-link">
-              <span>송악산</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">송악산</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -413,8 +418,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2414812-barrier-free.html" class="spot-link">
-              <span>신산공원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">신산공원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -426,8 +431,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2852695-barrier-free.html" class="spot-link">
-              <span>예술공간 이아</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">예술공간 이아</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -439,8 +444,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-128641-barrier-free.html" class="spot-link">
-              <span>제주목 관아</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주목 관아</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -452,8 +457,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-635928-barrier-free.html" class="spot-link">
-              <span>최남단체험감귤농장</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">최남단체험감귤농장</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -465,8 +470,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-660972-barrier-free.html" class="spot-link">
-              <span>하도리 철새도래지</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">하도리 철새도래지</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -478,8 +483,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-802844-barrier-free.html" class="spot-link">
-              <span>한라생태숲</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">한라생태숲</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -491,8 +496,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-591866-barrier-free.html" class="spot-link">
-              <span>금능해수욕장</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">금능해수욕장</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -504,8 +509,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-594065-barrier-free.html" class="spot-link">
-              <span>방림원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">방림원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -517,8 +522,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-601489-barrier-free.html" class="spot-link">
-              <span>서귀포해양도립공원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">서귀포해양도립공원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -530,8 +535,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-1925362-barrier-free.html" class="spot-link">
-              <span>어영공원</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">어영공원</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -543,8 +548,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-228853-barrier-free.html" class="spot-link">
-              <span>용두암</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">용두암</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -556,8 +561,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">서귀포</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2023350-barrier-free.html" class="spot-link">
-              <span>제주 동백마을</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">제주 동백마을</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -569,8 +574,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-591798-barrier-free.html" class="spot-link">
-              <span>하고수동해변</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">하고수동해변</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -582,8 +587,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">제주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-127490-barrier-free.html" class="spot-link">
-              <span>협재해수욕장</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">협재해수욕장</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>

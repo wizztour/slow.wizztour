@@ -44,12 +44,17 @@
     .top-nav { background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
     .top-nav a { color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }
     .container { max-width:1040px; margin:0 auto; padding:26px 18px 60px; }
-    .spot-row { cursor:pointer; transition:background 0.15s ease; }
+    .spot-row { cursor:pointer; transition:background 0.18s ease; }
     .spot-row:hover { background:#f0fdfa !important; }
-    .spot-link { display:flex; justify-content:space-between; align-items:center; gap:8px; color:#0f172a; font-weight:800; text-decoration:none; }
-    .spot-row:hover .spot-link { color:#0f766e; }
-    .spot-cta { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:6px; white-space:nowrap; text-decoration:none; flex-shrink:0; transition:all 0.15s ease; }
-    .spot-row:hover .spot-cta { background:#0f766e; color:#ffffff; border-color:#0f766e; }
+    .spot-link { display:flex; justify-content:space-between; align-items:center; gap:10px; color:#0f172a; font-weight:700; text-decoration:none; }
+    .spot-title { position:relative; display:inline-block; color:#0f172a; font-weight:700; transition:color 0.18s ease, transform 0.18s ease; }
+    .spot-title::after { content:''; position:absolute; left:0; bottom:-2px; width:100%; height:2px; background:#0f766e; border-radius:2px; transform:scaleX(0); transform-origin:left center; transition:transform 0.2s ease; }
+    .spot-row:hover .spot-title { color:#0f766e; transform:translateX(2px); }
+    .spot-row:hover .spot-title::after { transform:scaleX(1); }
+    .spot-cta { display:inline-flex; align-items:center; gap:4px; background:linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%); color:#0f766e; border:1px solid #99f6e4; font-size:12px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; box-shadow:0 1px 2px rgba(15, 118, 110, 0.08); transition:all 0.18s ease; }
+    .spot-arrow { display:inline-block; font-size:13px; line-height:1; transition:transform 0.18s ease; }
+    .spot-row:hover .spot-cta { background:linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color:#ffffff; border-color:#0f766e; box-shadow:0 3px 10px rgba(15, 118, 110, 0.25); transform:translateY(-1px); }
+    .spot-row:hover .spot-arrow { transform:translateX(3px); }
   </style>
 </head>
 <body>
@@ -101,8 +106,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">울주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2606222-barrier-free.html" class="spot-link">
-              <span>태화강생태관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">태화강생태관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -114,8 +119,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">남구</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3495467-barrier-free.html" class="spot-link">
-              <span>장생포고래문화특구</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">장생포고래문화특구</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -127,8 +132,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">북구</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2717813-barrier-free.html" class="spot-link">
-              <span>애니언파크(울산 반려동물 문화센터)</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">애니언파크(울산 반려동물 문화센터)</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -140,8 +145,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">울주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-634337-barrier-free.html" class="spot-link">
-              <span>울산암각화박물관</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">울산암각화박물관</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -153,8 +158,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">동구</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126091-barrier-free.html" class="spot-link">
-              <span>일산해수욕장(울산)</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">일산해수욕장(울산)</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -166,8 +171,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">울주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126096-barrier-free.html" class="spot-link">
-              <span>진하해수욕장</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">진하해수욕장</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -179,8 +184,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">울주</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-125418-barrier-free.html" class="spot-link">
-              <span>국립 신불산폭포자연휴양림</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">국립 신불산폭포자연휴양림</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -192,8 +197,8 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">남구</td>
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-769495-barrier-free.html" class="spot-link">
-              <span>장생포 고래바다여행선</span>
-              <span class="spot-cta">상세 보기 →</span>
+              <span class="spot-title">장생포 고래바다여행선</span>
+              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
