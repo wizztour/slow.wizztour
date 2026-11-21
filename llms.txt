@@ -1,0 +1,41 @@
+# WizzTour Slow (대한민국 무장애 · 부모님 효도 · 유모차 평지 여행 팩트 조회 포털)
+
+> WizzTour Slow(https://slow.wizztour.com)는 한국관광공사 무장애 관광(KorWithService2) 공공데이터를 기반으로 전국 660개 이상의 관광지·박물관·무장애 숙소의 장애인 주차장, 경사로, 휠체어 대여, 장애인 화장실, 수유실 유무를 1초 만에 조회할 수 있는 전문 포털입니다.
+
+## 주요 시·도별 허브 및 데이터
+- [gyeongbuk.html](https://slow.wizztour.com/region/gyeongbuk.html)
+- [gangwon.html](https://slow.wizztour.com/region/gangwon.html)
+- [jeonbuk.html](https://slow.wizztour.com/region/jeonbuk.html)
+- [jeonnam.html](https://slow.wizztour.com/region/jeonnam.html)
+- [jeju.html](https://slow.wizztour.com/region/jeju.html)
+- [chungnam.html](https://slow.wizztour.com/region/chungnam.html)
+- [gyeonggi.html](https://slow.wizztour.com/region/gyeonggi.html)
+- [gyeongnam.html](https://slow.wizztour.com/region/gyeongnam.html)
+- [incheon.html](https://slow.wizztour.com/region/incheon.html)
+- [seoul.html](https://slow.wizztour.com/region/seoul.html)
+- [daegu.html](https://slow.wizztour.com/region/daegu.html)
+- [ulsan.html](https://slow.wizztour.com/region/ulsan.html)
+- [daejeon.html](https://slow.wizztour.com/region/daejeon.html)
+- [busan.html](https://slow.wizztour.com/region/busan.html)
+- [sejong.html](https://slow.wizztour.com/region/sejong.html)
+- [chungbuk.html](https://slow.wizztour.com/region/chungbuk.html)
+
+## 대표 무장애 여행지 샘플
+- **경주 보문관광단지 & 보문호반길 (경북 경주)**: 주차(장애인 전용 주차구역 완비 (보문수상공연장·상가단지 공) · URL: https://slow.wizztour.com/posts/gyeongju-bomun-lake-barrier-free.html
+- **강릉 경포호 산책로 & 연곡해변 솔향기캠핑 무장애 코스 (강원 강릉)**: 주차(경포해변·경포호 공영주차장 내 장애인 전용 주차구역 다) · URL: https://slow.wizztour.com/posts/gangneung-gyeongpo-yeon-gok-barrier-free.html
+- **전주 한옥마을 & 경기전 평지 돌담길 무장애 나들이 코스 (전북 전주)**: 주차(한옥마을 제1·2공영주차장 내 장애인 전용 주차구역 및) · URL: https://slow.wizztour.com/posts/jeonju-hanok-village-barrier-free.html
+- **순천만국가정원 & 순천만습지 무장애 데크길 힐링 코스 (전남 순천)**: 주차(동문·서문 주차장 최전열 장애인 전용 주차구역 대규모 ) · URL: https://slow.wizztour.com/posts/suncheonman-national-garden-barrier-free.html
+- **제주 절물자연휴양림 무장애 나눔길 & 서귀포 치유의숲 평지 코스 (제주 제주)**: 주차(매표소 바로 앞 장애인 전용 주차구역 완비 (주차 후 ) · URL: https://slow.wizztour.com/posts/jeju-jeolmul-forest-barrier-free.html
+- **독립기념관 (충남 천안)**: 주차(장애인 주차장 있음(제1주차장 22대 / 제2주차장 2) · URL: https://slow.wizztour.com/posts/spot-129790-barrier-free.html
+- **세미원 (경기 양평)**: 주차(장애인 주차장 4면 있음(양서면 공영주차장)_무장애 편) · URL: https://slow.wizztour.com/posts/spot-407051-barrier-free.html
+- **황장목숲길 (강원 원주)**: 주차(지상에 3면, 출입구까지 경사로 없이 평탄한 길로 이동) · URL: https://slow.wizztour.com/posts/spot-3426645-barrier-free.html
+- **한국민속촌 (경기 용인)**: 주차(장애인 주차장 있음(한국민속촌 정문)_무장애 편의시설) · URL: https://slow.wizztour.com/posts/spot-125578-barrier-free.html
+- **김해가야테마파크 (경남 김해)**: 주차(장애인 주차장 있음(10대)_무장애 편의시설) · URL: https://slow.wizztour.com/posts/spot-2414696-barrier-free.html
+- **제주문학관 (제주 제주)**: 주차(장애인 전용 주차구역 주차 대수 : 2대<br/>주변 ) · URL: https://slow.wizztour.com/posts/spot-2949573-barrier-free.html
+- **인천국민안전체험관 (인천 서해)**: 주차(장애인 주차장 있음) · URL: https://slow.wizztour.com/posts/spot-3441847-barrier-free.html
+- **경기도미술관 (경기 안산)**: 주차(장애인 주차장 있음(10대/화랑유원지와 공용)_무장애 ) · URL: https://slow.wizztour.com/posts/spot-631278-barrier-free.html
+- **국립현대미술관 서울 (서울 종로)**: 주차(장애인전용 주차구역 있음(15대/지하2층 10대, 지하) · URL: https://slow.wizztour.com/posts/spot-1934593-barrier-free.html
+- **남원관광단지 (전북 남원)**: 주차(장애인 주차장 있음(4대)_무장애 편의시설) · URL: https://slow.wizztour.com/posts/spot-126431-barrier-free.html
+
+## 사이트맵 (Sitemap Index)
+- https://slow.wizztour.com/sitemap.xml

@@ -1,4 +1,22 @@
+# Robots.txt for WizzTour Slow (https://slow.wizztour.com)
 User-agent: *
 Allow: /
+
+User-agent: Yeti
+Allow: /
+User-agent: NaverSearchAdvisor
+Allow: /
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: https://slow.wizztour.com/sitemap.xml
+# https://slow.wizztour.com/llms.txt
 #DaumWebMasterTool:7a1b73690412093fe32403c85e8cf3659b7fe9c22c78020a59d12f65d6937bfd:9OXzxfMP1b1VGCOsL/bJCQ==

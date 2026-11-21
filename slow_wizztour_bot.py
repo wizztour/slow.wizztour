@@ -55,11 +55,30 @@ ADSENSE_CLIENT = "ca-pub-9640565499370684"
 AD_SLOT_TOP = "3911475090"     # slow 상단
 AD_SLOT_MID = "6591102613"     # slow 중간
 AD_SLOT_BOTTOM = "5109006694"  # slow 하단
+COUPANG_AF_ID = os.environ.get("COUPANG_AF_ID") or "AF2307983"
 SERVICE_KEY = os.environ.get("TOUR_API_KEY") or os.environ.get("PUBLIC_DATA_API_KEY") or ""
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
 GPT_API_KEY = os.environ.get("OPENAI_API_KEY") or ""
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID") or "1JErLxLYPvVufyxjvi6hnfbbQL7lyy4XEGLMrKZZb0x4"
 TRIPCOM_SHEET_NAME = "트립닷컴"
+
+PROVINCE_SLUG_MAP = {
+    "서울": "seoul", "경기": "gyeonggi", "인천": "incheon",
+    "강원": "gangwon", "충남": "chungnam", "충북": "chungbuk",
+    "대전": "daejeon", "세종": "sejong", "경북": "gyeongbuk",
+    "경남": "gyeongnam", "대구": "daegu", "울산": "ulsan",
+    "부산": "busan", "전북": "jeonbuk", "전남": "jeonnam",
+    "광주": "gwangju", "제주": "jeju", "전국": "all",
+}
+
+
+def get_province_slug(prov: str) -> str:
+    return PROVINCE_SLUG_MAP.get(prov, "etc")
+
+
+def make_coupang_affsrp_url(keyword: str) -> str:
+    """Zero-API 쿠팡 파트너스 공식 검색 랜딩 딥링크(AFFSRP)를 생성합니다. (subid 미합의 시 생략 원칙 준수)"""
+    return f"https://link.coupang.com/re/AFFSRP?lptag={COUPANG_AF_ID}&pageKey={quote(keyword)}"
 
 
 def make_common_head_meta() -> str:
@@ -104,10 +123,12 @@ client = OpenAI(api_key=GPT_API_KEY) if (OpenAI and GPT_API_KEY) else None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 POSTS_DIR = os.path.join(BASE_DIR, "posts")
+REGION_DIR = os.path.join(BASE_DIR, "region")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 CACHE_FILE = os.path.join(DATA_DIR, "slow_posts_db.json")
 
 os.makedirs(POSTS_DIR, exist_ok=True)
+os.makedirs(REGION_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 
 _WORKING_GEMINI_MODEL = None
@@ -462,10 +483,10 @@ VERIFIED_BARRIER_FREE_DESTINATIONS = [
 
 
 def fetch_kto_barrier_free_detail(content_id: str) -> dict:
-    """한국관광공사 KorWithService1/detailWithTour1 실시간 조회 (키 설정 시 병합)"""
+    """한국관광공사 KorWithService2/detailWithTour2 실시간 조회 (키 설정 시 병합)"""
     if not content_id or not SERVICE_KEY:
         return {}
-    url = "https://apis.data.go.kr/B551011/KorWithService1/detailWithTour1"
+    url = "https://apis.data.go.kr/B551011/KorWithService2/detailWithTour2"
     params = {
         "serviceKey": unquote(SERVICE_KEY),
         "MobileOS": "ETC",
@@ -482,7 +503,7 @@ def fetch_kto_barrier_free_detail(content_id: str) -> dict:
             if isinstance(item, dict):
                 return item
     except Exception as e:
-        print(f"[KorWithService1 참고] {e}")
+        print(f"[KorWithService2 참고] {e}")
     return {}
 
 
@@ -592,15 +613,14 @@ def make_barrier_free_pictogram_card_html(title: str, bf_data: dict, check_date_
 """.strip()
 
 
-def make_crowd_and_food_care_box_html(dest: dict) -> str:
+def make_crowd_and_food_care_box_html(dest: dict, allow_live_api: bool = False) -> str:
     """
     [승인 공공데이터 API 융합 박스]
     1) 한국관광공사_관광지 집중률 방문자 추이 예측 정보 & 빅데이터 지역별 방문자수
     2) 한국관광공사_관광음식 정보 서비스 (부모님·아이 맞춤 1층 평지 보양식)
-    3) 식약처 의약품 / 아이돌봄 가족 안심 팁
     """
     crowd = dest.get("crowd_prediction") or {}
-    live_crowd = fetch_kto_crowd_prediction(dest.get("city", ""), dest.get("title", ""))
+    live_crowd = fetch_kto_crowd_prediction(dest.get("city", ""), dest.get("title", "")) if allow_live_api else {}
     score_txt = live_crowd.get("live_cnctr_rate") or crowd.get("weekday_score", "쾌적")
     local_food = dest.get("local_food", "지역 대표 1층 입식 한정식")
 
@@ -752,18 +772,22 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
 """.strip()
 
 
-def generate_slow_persuasion_overview(dest: dict, check_date_str: str) -> str:
+def generate_slow_persuasion_overview(dest: dict, check_date_str: str, allow_ai: bool = False) -> str:
     """
     [판매 상위 1%의 노하우 6단계 워크북 + GPT Terra/Luna 하이브리드 본문 생성]
-    API 키 미설정 시에도 즉시 고품질 6단계 설득 본문을 생성하는 내장 템플릿 폴백 포함
+    사전 생성된 본문이나 내장 6단계 설득 템플릿을 우선 활용하여 대규모(수백~수천건) 빌드 시에도 초고속(0.01초) 처리합니다.
     """
+    if dest.get("ai_overview_html"):
+        return dest["ai_overview_html"]
     title = dest["title"]
     city = dest["city"]
     overview_origin = dest["overview"]
     bf = dest.get("barrier_free") or {}
     h1_name = dest["hotels"][0]["name"] if dest.get("hotels") else f"{city} 무장애 호텔"
 
-    prompt = f"""
+    ai_html = ""
+    if allow_ai and (GPT_API_KEY or GEMINI_API_KEY):
+        prompt = f"""
 당신은 대한민국 상위 1% 무장애·효도·유모차 여행 전문 에디터(slow.wizztour.com)입니다.
 아래 한국관광공사 공식 무장애 데이터를 바탕으로 '{title}' 방문 및 숙소 선택 가이드를 HTML(`<h3>`, `<p>`)로 작성하세요.
 
@@ -785,11 +809,11 @@ def generate_slow_persuasion_overview(dest: dict, check_date_str: str) -> str:
    "솔직히 주말 오후 시간대 주차장 혼잡이나 주변 구형 펜션들의 계단·문턱 구조는 아쉬운 점입니다. 다만 저는 계단 걱정 없이 평지 데크로 끝까지 산책할 수 있다는 1순위 조건을 더 중요하게 봤습니다. 제 여행 기준에서는 오전 일찍 방문하거나 엘리베이터와 장애인 편의시설이 검증된 인근 호텔({h1_name})을 거점으로 잡는 방식이기 때문에, 이 부분은 충분히 감수할 수 있다고 판단했습니다."
 3. 마크다운(`##`, `**`) 없이 순수 HTML 태그(`<h3>`, `<p>`, `<strong>`)만 출력하세요.
 """.strip()
-
-    ai_html = call_gpt_hybrid(prompt, max_tokens=1100, temperature=0.35, tier="terra")
-    if ai_html and "<h3" in ai_html:
-        ai_html = re.sub(r"```[a-zA-Z]*", "", ai_html).replace("```", "").strip()
-        return ai_html
+        ai_html = call_gpt_hybrid(prompt, max_tokens=1100, temperature=0.35, tier="terra")
+        if ai_html and "<h3" in ai_html:
+            ai_html = re.sub(r"```[a-zA-Z]*", "", ai_html).replace("```", "").strip()
+            dest["ai_overview_html"] = ai_html
+            return ai_html
 
     return f"""
 <h3>1. {escape(title)}, 휠체어·부모님 효도·유모차 여행지로 선택한 1순위 기준</h3>
@@ -815,51 +839,35 @@ def generate_slow_persuasion_overview(dest: dict, check_date_str: str) -> str:
 
 def make_usim_and_tour_affiliate_box_html(city: str) -> str:
     """
-    [세시간전(3hoursahead, AID: 121912) 클룩 모바일 입장권(874431) · 렌트카(874439) · eSIM/유심(874416/874419/874423) 수익화 박스]
+    [내국인 가족·효도 나들이 실사용 3종: 클룩 모바일 입장권 · SUV/카니발 렌트카 · KTX 기차표]
+    (한국인 대상 사이트이므로 외국인용 유심/eSIM·한복 스냅은 제외하여 클릭 집중도 향상)
     """
-    usim_url = AFFILIATE_LINKS.get("usim") or USIMSA_AFFILIATE_URL
     tour_url = AFFILIATE_LINKS.get("tour") or KLOOK_AFFILIATE_URL
     return f"""
 <section id="usim-and-tour-benefits" style="margin:26px 0; padding:20px; background:linear-gradient(135deg, #eef2ff 0%, #f0fdfa 100%); border:1px solid #c7d2fe; border-radius:16px;">
   <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
     <h3 style="margin:0; font-size:18px; color:#1e1b4b; font-weight:800;">
-      🎟️ {escape(city)} 무장애 여행 필수: 줄 서지 않는 모바일 티켓 · 휠체어/유모차 적재 렌트카 · eSIM 특가
+      🎟️ {escape(city)} 무장애 가족 나들이 실속 예약: 대기 0분 모바일 패스 · 대형 렌트카 · KTX 기차표
     </h3>
     <span style="background:#4f46e5; color:#fff; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px;">
-      클룩(Klook) 공식 제휴 특가
+      클룩·트립닷컴 공식 제휴
     </span>
   </div>
   <p style="margin:0 0 14px 0; font-size:13.8px; color:#334155; line-height:1.6;">
-    <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 대기하지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 미리 준비하시고, 접이식 휠체어·유모차가 넉넉히 실리는 <strong>SUV·승합 렌트카</strong>와 가족 여행용 <strong>5G eSIM·티머니 교통카드</strong> 혜택을 함께 확인해 보세요.
+    <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 줄 서지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 미리 준비하시고, 접이식 휠체어·유모차가 넉넉히 실리는 <strong>SUV·카니발 렌트카</strong>와 <strong>KTX 휠체어석·가족석</strong> 예매를 한 번에 확인하세요.
   </p>
   <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
     <a href="{escape(tour_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="text-align:center; background:#4f46e5; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      🎟️ [{escape(city)}] 줄 서지 않는 클룩 모바일 입장권·패스 할인 예매
+      🎟️ [{escape(city)}] 줄 서지 않는 모바일 입장권·패스 할인 예매
     </a>
     <a href="{escape(KLOOK_CAR_RENTAL_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="text-align:center; background:#047857; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      🚐 휠체어·유모차 넉넉한 SUV/카니발 클룩 렌트카 최저가 비교
-    </a>
-    <a href="{escape(usim_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      📶 5G 무제한 QR eSIM (SKT) 즉시 발급받기
-    </a>
-    <a href="{escape(KLOOK_SIM_TMONEY_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="text-align:center; background:#2563eb; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      🚇 무제한 유심 + 티머니(T-Money) 교통카드 패키지
+      🚐 휠체어·유모차 넉넉한 SUV/카니발 렌트카 최저가 비교
     </a>
     <a href="{escape(TRIPCOM_KTX_TRAIN_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
        style="text-align:center; background:#1e40af; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      🚄 부모님 효도·휠체어석 KTX 기차표 시간표 조회 &amp; 예매 (트립닷컴)
-    </a>
-    <a href="{escape(TRIPCOM_SNAP_PHOTO_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="text-align:center; background:#c026d3; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      📸 경복궁·한옥마을 부모님 효도·가족 한복 스냅사진 촬영 예약 (트립닷컴)
-    </a>
-    <a href="{escape(TRIPCOM_SEOUL_TICKETS_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-       style="text-align:center; background:#7c3aed; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
-      🗼 서울·수도권 전망대·아쿠아리움·명소 모바일 입장권 특가 (트립닷컴)
+      🚄 부모님 효도·휠체어석 KTX 기차표 예매 (트립닷컴)
     </a>
   </div>
 </section>
@@ -867,51 +875,281 @@ def make_usim_and_tour_affiliate_box_html(city: str) -> str:
 
 
 # ==============================================================================
-# 4. 개별 상세 페이지 & 메인 포털 HTML 빌더
+# 3-B. CarCare식 1초 스펙표 · 결핍 해결형 쿠팡 파트너스 · 지역 관련명소 거미줄
 # ==============================================================================
-def build_post_page_html(dest: dict, check_date_str: str) -> str:
+def _bf_ok(bf: dict, key: str) -> bool:
+    v = str((bf or {}).get(key) or "").strip()
+    return bool(v and v not in ("없음", "불가", "N", "미확인"))
+
+
+def make_quick_spec_table_html(dest: dict, bf: dict) -> str:
+    """CarCare 와이퍼/타이어 규격표처럼 1초 만에 시설 유무와 상세 조건을 확인하는 상단 팩트 스펙표"""
+    title = dest["title"]
+    specs = [
+        ("🅿️ 장애인 전용 주차장", "parking", "미확인 (일반 주차장 확인)"),
+        ("🛤️ 무장애 접근로 · 경사로", "route", "현장 안내소 동선 확인"),
+        ("🚪 주출입구 단차 · 경사로", "exit", "현장 주출입구 확인"),
+        ("🦽 휠체어 현장 대여", "wheelchair", "미확인 · 개인 휴대 휠체어 권장"),
+        ("🛗 장애인 엘리베이터", "elevator", "단층 또는 현장 확인"),
+        ("🚻 장애인 전용 화장실", "restroom", "현장 다목적 화장실 확인"),
+        ("👶 유모차 · 수유실 · 가족시설", "lactationroom" if _bf_ok(bf, "lactationroom") else "stroller", "인근 편의시설 확인"),
+        ("🛏️ 인근 장애인객실 숙소", "room", f"{dest.get('city', '인근')} 무장애 검증 호텔 참고"),
+    ]
+    rows_html = ""
+    for i, (name, key, fallback) in enumerate(specs):
+        bg = "#ffffff" if i % 2 == 0 else "#f8fafc"
+        ok = _bf_ok(bf, key)
+        if not ok and key == "stroller" and _bf_ok(bf, "infantsfamilyetc"):
+            ok = True
+            detail = str(bf.get("infantsfamilyetc"))
+        else:
+            detail = str(bf.get(key) or fallback)
+        badge = (
+            '<span style="background:#dcfce7; color:#15803d; font-weight:800; padding:2px 9px; border-radius:999px; font-size:12px;">✔ 확인(O)</span>'
+            if ok
+            else '<span style="background:#fef3c7; color:#b45309; font-weight:700; padding:2px 9px; border-radius:999px; font-size:12px;">현장확인</span>'
+        )
+        rows_html += (
+            f'<tr style="background:{bg};">'
+            f'<td style="padding:9px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f172a; white-space:nowrap;">{name}</td>'
+            f'<td style="padding:9px 10px; border:1px solid #e2e8f0; text-align:center; white-space:nowrap;">{badge}</td>'
+            f'<td style="padding:9px 12px; border:1px solid #e2e8f0; color:#334155;">{escape(detail)}</td>'
+            f'</tr>'
+        )
+    return f"""
+<section id="quick-spec-table" style="margin:20px 0 24px 0; padding:18px 18px 14px; background:#ffffff; border:2px solid #0f766e; border-radius:14px;">
+  <h2 style="margin:0 0 10px 0; font-size:18.5px; color:#0f172a; font-weight:800;">
+    ⚡ 1초 무장애 시설 조회표: {escape(title)}
+  </h2>
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:13.5px; min-width:480px;">
+      <thead>
+        <tr style="background:#0f172a; color:#ffffff;">
+          <th style="padding:9px 12px; border:1px solid #334155; text-align:left;">확인 항목</th>
+          <th style="padding:9px 10px; border:1px solid #334155; text-align:center;">유무</th>
+          <th style="padding:9px 12px; border:1px solid #334155; text-align:left;">한국관광공사 공식 상세 데이터</th>
+        </tr>
+      </thead>
+      <tbody>{rows_html}</tbody>
+    </table>
+  </div>
+</section>
+""".strip()
+
+
+def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
+    """
+    [CarCare식 결핍 해결형 쿠팡 파트너스 연동 박스]
+    명소의 무장애 팩트 데이터(휠체어 대여 유무·유모차/수유실·산책거리)에 1:1 직결되는 필수 준비물을 Zero-API AFFSRP 딥링크로 연결
+    """
+    title = dest["title"]
+    city = dest.get("city", "")
+    ctid = str(dest.get("contentTypeId") or "12")
+    has_wheelchair_rental = _bf_ok(bf, "wheelchair")
+    has_baby = _bf_ok(bf, "stroller") or _bf_ok(bf, "lactationroom") or _bf_ok(bf, "infantsfamilyetc")
+
+    if ctid == "32":
+        reason_msg = f"🏨 <strong>{escape(title)}</strong> 숙박 시 객실 내 어르신 낙상 예방 및 편안한 숙면을 위해 미리 준비하면 좋은 케어 용품입니다."
+        products = [
+            ("🛁 욕실 미끄럼방지 안전매트 · 휴대용 안전바", "어르신·아이 샤워실 미끄럼 사고 완벽 대비", "욕실 미끄럼방지 안전매트", "#0f766e", "인기 필수템"),
+            ("🛏️ 여행용 접이식 경추베개 · 휴대용 발마사지기", "장거리 이동 후 뭉친 부모님 목·종아리 피로 해소", "여행용 경추베개", "#2563eb", "효도 베스트"),
+        ]
+    elif has_baby and not has_wheelchair_rental:
+        reason_msg = f"👶 <strong>{escape(title)}</strong>은(는) 가족·유모차 동반 적합지이지만 현장 휠체어 대여 정보가 확인되지 않았습니다. 온 가족 동반 시 출발 전 꼭 점검해 보세요."
+        products = [
+            ("👶 초경량 기내반입 접이식 휴대용 유모차", "평지 데크·전시관 이동에 최적화된 가벼운 핸들링", "초경량 기내반입 휴대용 유모차", "#2563eb", "가족 필수 1위"),
+            ("🦽 초경량 접이식 휴대용 알루미늄 휠체어", "트렁크 적재 간편 · 현장 대여 품절 걱정 끝", "초경량 접이식 휴대용 휠체어", "#0f766e", "현장대비 필수"),
+        ]
+    elif has_baby:
+        reason_msg = f"🍼 <strong>{escape(title)}</strong> 유모차·영유아 편의시설 확인 완료! 나들이 현장에서 가장 많이 찾는 유모차·외출 필수 준비물을 모았습니다."
+        products = [
+            ("👶 초경량 기내반입 휴대용 유모차 · 방풍커버", "바람·햇빛 차단 및 편안한 평지 산책 주행", "유모차 방풍커버 햇빛가리개", "#2563eb", "유모차 인기"),
+            ("🍼 휴대용 젖병 보온 파우치 · 힙시트 아기띠", "수유실 이동 전후 간편한 외출 수유·휴대 수납", "휴대용 젖병 보온 파우치", "#ea580c", "부모 선호"),
+        ]
+    else:
+        wc_note = "현장 대여 수량이 조기 소진될 수 있어" if has_wheelchair_rental else "공식 데이터상 현장 휠체어 대여 여부가 확인되지 않아"
+        reason_msg = f"🦽 <strong>{escape(title)}</strong> 방문 전 체크: {wc_note}, 어르신 보행 부담 및 대기 줄 피로를 덜어주는 휴대용 보조장비 준비를 권장합니다."
+        products = [
+            ("🦽 초경량 접이식 휴대용 휠체어 (차량 적재형)", "무게 가볍고 한 번에 접혀 일반 승용차 트렁크 수납", "초경량 접이식 휴대용 휠체어", "#0f766e", "인기 1위"),
+            ("🪑 지팡이 겸용 초경량 접이식 휴대의자", "걷다가 무릎 아플 때 1초 만에 펼쳐 앉는 효도 필수템", "지팡이 접이식 의자", "#ea580c", "효도 베스트"),
+        ]
+
+    cards_html = ""
+    for p_title, p_desc, kw, color, badge in products:
+        c_url = make_coupang_affsrp_url(kw)
+        cards_html += f"""
+        <div style="background:#ffffff; border:1px solid #fed7aa; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <span style="background:#fff7ed; color:#c2410c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; border:1px solid #fdba74;">{escape(badge)}</span>
+            <span style="font-size:11.5px; color:#64748b;">로켓배송 추천</span>
+          </div>
+          <div style="font-size:15px; font-weight:800; color:#0f172a; line-height:1.4;">{p_title}</div>
+          <div style="font-size:13px; color:#475569; line-height:1.5;">{p_desc}</div>
+          <a href="{escape(c_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+             style="margin-top:auto; display:block; text-align:center; background:{color}; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:10px 14px; border-radius:8px; text-decoration:none;">
+            🚀 쿠팡에서 '{escape(kw)}' 최저가 확인 →
+          </a>
+        </div>
+        """.strip()
+
+    default_kw = quote(f"{city} 여행 부모님 효도 선물 무릎보호대" if not has_baby else "유모차 쿨시트 휴대용 선풍기")
+    return f"""
+<section id="coupang-care-gear" style="margin:24px 0; padding:18px 18px 20px; background:linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%); border:2px solid #f97316; border-radius:16px;">
+  <div style="background:#ffffff; border-left:4px solid #f97316; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px; font-weight:700; color:#0f172a; line-height:1.5;">
+    📢 이 포스팅은 <span style="color:#ea580c; font-weight:800;">쿠팡 파트너스</span> 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+  </div>
+  <h3 style="margin:0 0 8px 0; font-size:18px; color:#9a3412; font-weight:800;">
+    🛒 {escape(title)} 맞춤 무장애·효도·유모차 필수 준비물 (출발 전 로켓배송)
+  </h3>
+  <p style="margin:0 0 14px 0; font-size:13.8px; color:#431407; line-height:1.6;">{reason_msg}</p>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+    {cards_html}
+  </div>
+  <div style="margin-top:14px; padding-top:12px; border-top:1px dashed #fdba74; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+    <input type="text" id="cpSearchInput" placeholder="필요한 준비물 검색 (예: 보행보조차, 무릎보호대, 방풍커버)"
+           style="flex:1 1 220px; padding:9px 12px; border:1px solid #fdba74; border-radius:8px; font-size:13.5px;">
+    <button type="button"
+            onclick="var q=document.getElementById('cpSearchInput').value.trim()||'접이식 휠체어'; window.open('https://link.coupang.com/re/AFFSRP?lptag={COUPANG_AF_ID}&pageKey='+encodeURIComponent(q), '_blank', 'noopener,noreferrer');"
+            style="background:#ea580c; color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:800; font-size:13.5px; cursor:pointer;">
+      🔍 쿠팡 최저가 바로 검색
+    </button>
+  </div>
+</section>
+""".strip()
+
+
+def make_related_spots_html(dest: dict, all_destinations: list) -> str:
+    """같은 시/군 및 같은 시/도의 다른 무장애 명소 최대 6곳을 연결해 내부 링크 거미줄 및 PV를 극대화합니다."""
+    if not all_destinations:
+        return ""
+    cur_cid = str(dest.get("contentid") or "")
+    cur_city = dest.get("city", "")
+    cur_prov = dest.get("province", "")
+
+    same_city = [d for d in all_destinations if str(d.get("contentid")) != cur_cid and d.get("city") == cur_city]
+    same_prov = [d for d in all_destinations if str(d.get("contentid")) != cur_cid and d.get("province") == cur_prov and d.get("city") != cur_city]
+    picks = (same_city + same_prov)[:6]
+    if not picks:
+        return ""
+
+    cards = ""
+    for p in picks:
+        bf_cnt = len(p.get("barrier_free") or {})
+        cards += f"""
+        <a href="{SITE_BASE_URL}/posts/{escape(p['slug'])}.html" style="display:flex; flex-direction:column; gap:5px; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:13px 14px; text-decoration:none; color:inherit;">
+          <span style="font-size:11.5px; font-weight:800; color:#0f766e;">📍 {escape(p.get('province',''))} · {escape(p.get('city',''))} (확인 {bf_cnt}항목)</span>
+          <span style="font-size:14.5px; font-weight:800; color:#0f172a; line-height:1.4;">{escape(p['title'])}</span>
+          <span style="font-size:12px; color:#64748b;">주차장·경사로·화장실 유무 조회 →</span>
+        </a>
+        """.strip()
+
+    prov_slug = get_province_slug(cur_prov)
+    return f"""
+<section id="related-barrier-free-spots" style="margin:28px 0; padding:20px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px;">
+    <h2 style="margin:0; font-size:18.5px; color:#0f172a; font-weight:800;">
+      🧭 함께 가기 좋은 {escape(cur_prov)} · {escape(cur_city)} 무장애 명소 ({len(picks)}선)
+    </h2>
+    <a href="{SITE_BASE_URL}/region/{prov_slug}.html" style="font-size:13px; font-weight:800; color:#0f766e; text-decoration:none;">
+      {escape(cur_prov)} 전체 무장애 코스 보기 →
+    </a>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+    {cards}
+  </div>
+</section>
+""".strip()
+
+
+# ==============================================================================
+# 4. 개별 상세 페이지 & 지역 허브 & 메인 포털 HTML 빌더
+# ==============================================================================
+def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list = None, is_live_refresh: bool = False) -> str:
     title = dest["title"]
     city = dest["city"]
     province = dest["province"]
     slug = dest["slug"]
-    year_str = datetime.now(KST).strftime("%Y")
-    seo_title = f"[{year_str} {city}] {title} 휠체어·유모차·부모님 효도 평지 코스 & 무장애 호텔 비교 | WizzTour Slow"
-    meta_desc = f"✅ 1분 요약 ({check_date_str} 확인 기준): {title} 장애인 주차장·경사로·휠체어/유모차 대여·화장실 12대 픽토그램 성적표, KTO 빅데이터 혼잡도 골든타임, 계단 없는 평지 산책 코스, 엘리베이터·장애인객실 호텔 비교 가이드."
+    ctid = str(dest.get("contentTypeId") or "12")
     canonical = f"{SITE_BASE_URL}/posts/{slug}.html"
     tripcom_url = resolve_hotel_affiliate_url(city, province)
 
-    # 실시간 KTO API 데이터 병합 시도
-    live_bf = fetch_kto_barrier_free_detail(dest.get("contentid", ""))
     merged_bf = dict(dest.get("barrier_free") or {})
-    for k, v in live_bf.items():
-        if v and str(v).strip() not in ("", "없음"):
-            merged_bf[k] = str(v).strip()
+    if is_live_refresh and len(merged_bf) < 2:
+        live_bf = fetch_kto_barrier_free_detail(dest.get("contentid", ""))
+        for k, v in live_bf.items():
+            if v and str(v).strip() not in ("", "없음"):
+                merged_bf[k] = str(v).strip()
 
+    # CarCare식 팩트 조회형 SEO 타이틀 자동 조합
+    verified_badges = []
+    if _bf_ok(merged_bf, "parking"): verified_badges.append("주차장O")
+    if _bf_ok(merged_bf, "route") or _bf_ok(merged_bf, "exit"): verified_badges.append("경사로O")
+    if _bf_ok(merged_bf, "wheelchair"): verified_badges.append("휠체어대여O")
+    if _bf_ok(merged_bf, "restroom"): verified_badges.append("화장실O")
+    if _bf_ok(merged_bf, "stroller") or _bf_ok(merged_bf, "lactationroom"): verified_badges.append("유모차·수유실")
+    if _bf_ok(merged_bf, "room"): verified_badges.append("장애인객실O")
+    badge_str = "·".join(verified_badges[:4]) if verified_badges else "12대 무장애 정보"
+
+    if ctid == "32":
+        seo_title = f"{title} 무장애 숙소 조회 | {badge_str} ({province} {city}) - WizzTour Slow"
+    else:
+        seo_title = f"{title} 무장애 정보 | {badge_str} 조회 ({province} {city}) - WizzTour Slow"
+
+    meta_desc = f"✅ 1초 확인 ({check_date_str} 기준): {province} {city} {title}의 {badge_str} 상세 위치, KTO 혼잡도 골든타임, 계단 없는 평지 산책 코스 및 엘리베이터·장애인객실 호텔 비교 가이드."
+
+    spec_table_html = make_quick_spec_table_html(dest, merged_bf)
+    coupang_box_html = make_coupang_care_box_html(dest, merged_bf)
     pictogram_html = make_barrier_free_pictogram_card_html(title, merged_bf, check_date_str)
-    crowd_food_html = make_crowd_and_food_care_box_html(dest)
-    overview_html = generate_slow_persuasion_overview(dest, check_date_str)
+    crowd_food_html = make_crowd_and_food_care_box_html(dest, allow_live_api=is_live_refresh)
+    overview_html = generate_slow_persuasion_overview(dest, check_date_str, allow_ai=is_live_refresh)
     flat_route_html = make_slow_flat_route_html(title, city, dest.get("flat_route") or [])
     hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], check_date_str, province=province)
     usim_tour_html = make_usim_and_tour_affiliate_box_html(city)
+    related_html = make_related_spots_html(dest, all_destinations or [])
 
     tags_html = "".join(
         f'<span style="background:#ccfbf1; color:#0f766e; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px;">#{escape(t)}</span>'
         for t in (dest.get("category_tags") or [])
     )
 
+    faq_parking = merged_bf.get("parking") or "방문 전 현장 장애인 전용 주차구역 안내를 확인해 주세요."
+    faq_route = merged_bf.get("route") or merged_bf.get("exit") or "주출입구 경사로 및 단차 여부를 현장 안내소에서 확인할 수 있습니다."
+    faq_wc = merged_bf.get("wheelchair") or merged_bf.get("stroller") or "현장 휠체어·유모차 대여 가능 여부는 방문 전 안내소 문의 또는 개인 휴대를 권장합니다."
+    faq_rest = merged_bf.get("restroom") or "현장 내 장애인 전용 화장실 및 다목적 화장실 이용 안내를 참고하세요."
+
     json_ld = {
         "@context": "https://schema.org",
         "@graph": [
             {
-                "@type": "TouristAttraction",
+                "@type": "LodgingBusiness" if ctid == "32" else "TouristAttraction",
                 "name": title,
                 "description": meta_desc,
                 "image": dest.get("image", ""),
                 "address": {"@type": "PostalAddress", "streetAddress": dest.get("addr", ""), "addressLocality": city, "addressRegion": province, "addressCountry": "KR"},
-                "isAccessibleForFree": True,
+                "isAccessibleForFree": True if ctid != "32" else False,
                 "publicAccess": True,
                 "touristType": ["Wheelchair Users", "Senior Citizens", "Families with Strollers"],
                 "isPartOf": {"@id": "https://www.wizztour.com/#organization"}
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": f"{title}에 장애인 전용 주차장과 무장애 경사로가 있나요?",
+                        "acceptedAnswer": {"@type": "Answer", "text": f"주차장: {faq_parking} / 접근로: {faq_route}"}
+                    },
+                    {
+                        "@type": "Question",
+                        "name": f"{title}에서 휠체어나 유모차 대여가 가능한가요?",
+                        "acceptedAnswer": {"@type": "Answer", "text": faq_wc}
+                    },
+                    {
+                        "@type": "Question",
+                        "name": f"{title} 내 장애인 전용 화장실 정보는 어떻게 되나요?",
+                        "acceptedAnswer": {"@type": "Answer", "text": faq_rest}
+                    }
+                ]
             },
             {
                 "@type": "Organization",
@@ -995,7 +1233,7 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
         📢 세시간전 크리에이터 활동을 통해 수익이 발생하는 링크가 포함되어 있습니다. 해당 링크를 통해 상품을 구매할 경우 수수료가 지급됩니다.
       </div>
       <p style="font-size:13.5px; color:#64748b; margin:0 0 16px 0;">
-        📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(check_date_str)} (한국관광공사 열린관광·KorWithService1·집중률 API 기준)
+        📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(check_date_str)} (한국관광공사 열린관광·KorWithService2·집중률 API 기준)
       </p>
 
       <div style="background:#ecfdf5; border-left:4px solid #0d9488; padding:14px 16px; border-radius:8px; font-weight:700; color:#065f46; margin-bottom:20px;">
@@ -1004,7 +1242,13 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 
 {ad_top_html}
 
-      <img src="{escape(dest.get('image', ''))}" alt="{escape(title)} 무장애 평지 산책로" style="width:100%; max-height:420px; object-fit:cover; border-radius:14px; margin-bottom:20px;">
+      <!-- 1초 무장애 시설 조회표 (CarCare 규격표 패턴) -->
+      {spec_table_html}
+
+      <!-- 명소 결핍 해결형 쿠팡 파트너스 맞춤 준비물 추천 -->
+      {coupang_box_html}
+
+      <img src="{escape(dest.get('image', ''))}" alt="{escape(title)} 무장애 평지 산책로" loading="lazy" style="width:100%; max-height:420px; object-fit:cover; border-radius:14px; margin-bottom:20px;">
 
       <!-- [STEP 6 - 1차 링크 배치: 선택 이유 직후 무장애 숙소 & 지도 빠른 확인 CTA] -->
       {overview_html}
@@ -1064,6 +1308,9 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
         </div>
       </div>
 
+      <!-- 같은 지역 다른 무장애 명소 내부링크 거미줄 -->
+      {related_html}
+
       <div style="margin-top:24px; padding:20px 18px; background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; border-radius:16px; text-align:center;">
         <p style="color:#5eead4; font-size:12.5px; font-weight:800; letter-spacing:0.8px; margin:0 0 6px 0;">🕸️ WIZZTOUR 4대 여행 생태계 거미줄 네트워크</p>
         <h3 style="color:#ffffff; font-size:17px; margin:0 0 8px 0;">함께 비교하면 좋은 WizzTour 공식 자매 사이트</h3>
@@ -1086,20 +1333,141 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 """
 
 
+def build_region_hub_html(province: str, spots: list, check_date_str: str) -> str:
+    """시·도별 모든 무장애 명소와 1초 유무 요약표를 정적 렌더링해 검색봇 크롤링 깊이 & 지역 키워드 노출을 극대화합니다."""
+    prov_slug = get_province_slug(province)
+    common_head = make_common_head_meta()
+    ad_top_html = make_adsense_unit_html(AD_SLOT_TOP, "slow 상단")
+    ad_mid_html = make_adsense_unit_html(AD_SLOT_MID, "slow 중간")
+    ad_bottom_html = make_adsense_unit_html(AD_SLOT_BOTTOM, "slow 하단")
+    hub_title = f"{province} 무장애·휠체어·유모차·효도 여행지 {len(spots)}곳 전체 조회 | WizzTour Slow"
+    hub_desc = f"{province} 지역 {len(spots)}개 관광지·박물관·숙소의 장애인 주차장, 경사로, 휠체어 대여, 장애인 화장실 유무 1초 비교표."
+    canonical = f"{SITE_BASE_URL}/region/{prov_slug}.html"
+
+    rows = ""
+    for i, d in enumerate(spots):
+        bf = d.get("barrier_free") or {}
+        p_ok = "O" if _bf_ok(bf, "parking") else "-"
+        r_ok = "O" if (_bf_ok(bf, "route") or _bf_ok(bf, "exit")) else "-"
+        w_ok = "O" if _bf_ok(bf, "wheelchair") else "-"
+        t_ok = "O" if _bf_ok(bf, "restroom") else "-"
+        s_ok = "O" if (_bf_ok(bf, "stroller") or _bf_ok(bf, "lactationroom")) else "-"
+        bg = "#ffffff" if i % 2 == 0 else "#f8fafc"
+        rows += f"""
+        <tr style="background:{bg};">
+          <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">{escape(d.get('city',''))}</td>
+          <td style="padding:10px 12px; border:1px solid #e2e8f0;"><a href="{SITE_BASE_URL}/posts/{escape(d['slug'])}.html" style="color:#0f172a; font-weight:800; text-decoration:none;">{escape(d['title'])}</a></td>
+          <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if p_ok=='O' else '#94a3b8'};">{p_ok}</td>
+          <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if r_ok=='O' else '#94a3b8'};">{r_ok}</td>
+          <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if w_ok=='O' else '#94a3b8'};">{w_ok}</td>
+          <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if t_ok=='O' else '#94a3b8'};">{t_ok}</td>
+          <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if s_ok=='O' else '#94a3b8'};">{s_ok}</td>
+        </tr>
+        """.strip()
+
+    coupang_wheel = make_coupang_affsrp_url("초경량 접이식 휴대용 휠체어")
+    coupang_chair = make_coupang_affsrp_url("지팡이 접이식 의자")
+
+    return f"""<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{escape(hub_title)}</title>
+  <meta name="description" content="{escape(hub_desc)}">
+{common_head}
+  <link rel="canonical" href="{escape(canonical)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WizzTour Slow">
+  <meta property="og:title" content="{escape(hub_title)}">
+  <meta property="og:description" content="{escape(hub_desc)}">
+  <meta property="og:url" content="{escape(canonical)}">
+  <meta property="og:image" content="{SITE_BASE_URL}/assets/og-image.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; line-height:1.65; }}
+    .top-nav {{ background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }}
+    .top-nav a {{ color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }}
+    .container {{ max-width:1040px; margin:0 auto; padding:26px 18px 60px; }}
+  </style>
+</head>
+<body>
+  <header class="top-nav">
+    <a href="{SITE_BASE_URL}/" style="font-size:17px; color:#ffffff; display:inline-flex; align-items:center; gap:8px;">
+      <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%;">
+      <span>WizzTour Slow</span>
+    </a>
+    <div style="display:flex; gap:14px;">
+      <a href="{SITE_BASE_URL}/">전국 전체 보기</a>
+      <a href="https://www.wizztour.com" target="_blank" rel="noopener">축제 메인</a>
+    </div>
+  </header>
+  <main class="container">
+    <h1 style="font-size:26px; margin:0 0 8px 0; font-weight:800;">📍 {escape(province)} 무장애·효도·유모차 여행지 ({len(spots)}곳) 전체 조회표</h1>
+    <p style="margin:0 0 18px 0; color:#475569; font-size:14.5px;">한국관광공사 KorWithService2 공식 데이터 기반 · 최종 확인일: {escape(check_date_str)}</p>
+{ad_top_html}
+    <div style="background:#fff7ed; border:1px solid #fdba74; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+      <span style="font-size:13.5px; font-weight:700; color:#9a3412;">📢 쿠팡 파트너스 활동으로 수수료를 제공받습니다. 출발 전 휠체어·효도 준비물을 점검하세요:</span>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="{escape(coupang_wheel)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#0f766e; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">접이식 휴대용 휠체어 최저가</a>
+        <a href="{escape(coupang_chair)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#ea580c; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">지팡이 휴대의자 보기</a>
+      </div>
+    </div>
+    <div style="overflow-x:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px;">
+      <table style="width:100%; border-collapse:collapse; font-size:13.8px; min-width:560px;">
+        <thead>
+          <tr style="background:#0f172a; color:#ffffff;">
+            <th style="padding:11px 12px; text-align:left;">시·군</th>
+            <th style="padding:11px 12px; text-align:left;">명소명 (클릭 시 상세조회)</th>
+            <th style="padding:11px 8px; text-align:center;">주차</th>
+            <th style="padding:11px 8px; text-align:center;">경사로</th>
+            <th style="padding:11px 8px; text-align:center;">휠체어</th>
+            <th style="padding:11px 8px; text-align:center;">화장실</th>
+            <th style="padding:11px 8px; text-align:center;">유모차</th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+{ad_mid_html}
+{ad_bottom_html}
+  </main>
+</body>
+</html>
+"""
+
+
 def build_index_html(destinations: list, check_date_str: str) -> str:
-    cards = ""
+    # 1. 지역별 허브 링크 집계
+    prov_counts = {}
     for d in destinations:
+        p = d.get("province", "전국")
+        prov_counts[p] = prov_counts.get(p, 0) + 1
+    sorted_provs = sorted(prov_counts.items(), key=lambda x: (-x[1], x[0]))
+    region_links_html = "".join(
+        f'<a href="region/{get_province_slug(p)}.html" style="background:#ffffff; color:#0f766e; border:1px solid #99f6e4; font-size:13px; font-weight:800; padding:7px 14px; border-radius:999px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">'
+        f'📍 {escape(p)} <span style="background:#ccfbf1; padding:1px 7px; border-radius:999px; font-size:11.5px;">{cnt}</span></a>'
+        for p, cnt in sorted_provs
+    )
+
+    # 2. 초기 렌더링 36개 (LCP 속도 보호, 나머지 전체 검색은 slow_search_index.json으로 즉시 지원!)
+    cards = ""
+    for d in destinations[:36]:
         tags = " ".join(d.get("category_tags") or [])
+        bf_cnt = len(d.get("barrier_free") or {})
         badge_html = "".join(
             f'<span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#{escape(t)}</span>'
-            for t in (d.get("category_tags") or [])
+            for t in (d.get("category_tags") or [])[:3]
         )
         cards += f"""
         <article class="spot-card" data-tags="{escape(tags)} {escape(d['city'])} {escape(d['province'])}">
           <a href="posts/{escape(d['slug'])}.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
-            <div style="height:190px; background:url('{escape(d.get('image', ''))}') center/cover no-repeat; position:relative;">
+            <div style="height:190px; background:#e2e8f0 url('{escape(d.get('image', ''))}') center/cover no-repeat; position:relative;">
               <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">
                 📍 {escape(d['province'])} · {escape(d['city'])}
+              </span>
+              <span style="position:absolute; bottom:10px; right:10px; background:rgba(15,118,110,0.92); color:#ffffff; font-size:11.5px; font-weight:800; padding:3px 9px; border-radius:999px;">
+                ✔ {bf_cnt}항목 확인
               </span>
             </div>
             <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
@@ -1107,7 +1475,7 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
               <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">{escape(d['title'])}</h2>
               <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">{escape(d['overview'][:115])}…</p>
               <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
-                <span>♿ 12대 픽토그램 · 혼잡도 · 호텔 비교</span>
+                <span>⚡ 주차·경사로·화장실 유무 1초 조회</span>
                 <span>→</span>
               </div>
             </div>
@@ -1119,8 +1487,8 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
     ad_top_html = make_adsense_unit_html(AD_SLOT_TOP, "slow 상단")
     ad_mid_html = make_adsense_unit_html(AD_SLOT_MID, "slow 중간")
     ad_bottom_html = make_adsense_unit_html(AD_SLOT_BOTTOM, "slow 하단")
-    idx_title = "WizzTour Slow (slow.wizztour.com) | 계단·턱 없는 무장애·부모님 효도·유모차 평지 여행 &amp; 편안한 숙소 가이드"
-    idx_desc = "한국관광공사 열린관광(KorWithService1) &amp; 빅데이터 혼잡도 예측 연동! 휠체어 이용자, 무릎 약한 부모님 효도여행, 유모차 나들이를 위한 계단 없는 평지 산책 코스와 엘리베이터·장애인객실 호텔 비교 포털."
+    idx_title = f"WizzTour Slow (slow.wizztour.com) | 전국 무장애·휠체어·부모님 효도·유모차 여행지 {len(destinations)}곳 1초 조회"
+    idx_desc = f"한국관광공사 무장애 관광(KorWithService2) 기반 전국 {len(destinations)}개 명소 장애인 주차장·경사로·휠체어 대여·화장실·수유실 유무 실시간 조회 포털."
     idx_og_img = f"{SITE_BASE_URL}/assets/og-image.jpg"
 
     return f"""<!DOCTYPE html>
@@ -1147,10 +1515,12 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; }}
-    .hero {{ background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:42px 20px 38px; text-align:center; }}
-    .hero h1 {{ margin:10px 0 12px; font-size:30px; font-weight:800; line-height:1.35; }}
-    .hero p {{ max-width:680px; margin:0 auto 22px; color:#ccfbf1; font-size:15px; line-height:1.65; }}
-    .filter-bar {{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:760px; margin:0 auto; }}
+    .hero {{ background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:40px 20px 36px; text-align:center; }}
+    .hero h1 {{ margin:10px 0 12px; font-size:29px; font-weight:800; line-height:1.35; }}
+    .hero p {{ max-width:700px; margin:0 auto 20px; color:#ccfbf1; font-size:15px; line-height:1.65; }}
+    .search-box {{ max-width:620px; margin:0 auto 18px; display:flex; gap:8px; }}
+    .search-box input {{ flex:1; padding:12px 16px; border-radius:999px; border:2px solid #5eead4; font-size:14.5px; outline:none; }}
+    .filter-bar {{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:780px; margin:0 auto; }}
     .filter-btn {{ background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:700; transition:0.2s; }}
     .filter-btn.active, .filter-btn:hover {{ background:#14b8a6; border-color:#14b8a6; color:#0f172a; }}
     .container {{ max-width:1100px; margin:0 auto; padding:26px 18px 60px; }}
@@ -1165,30 +1535,45 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
       <img src="/assets/brand-circle.png" alt="WizzTour Slow Logo" width="70" height="70" style="display:block; width:100%; height:100%; border-radius:50%;">
     </div>
     <span style="background:#14b8a6; color:#0f172a; font-size:12px; font-weight:800; padding:4px 12px; border-radius:999px;">
-      ♿ 한국관광공사 무장애 관광(KorWithService1) · 빅데이터 혼잡도 공식 연동
+      ♿ 한국관광공사 KorWithService2 공식 연동 · 전국 {len(destinations)}곳 무장애 팩트 DB
     </span>
-    <h1>느린 걸음으로 더 깊게 쉬어가는 여행, WizzTour Slow</h1>
+    <h1>전국 무장애 · 효도 · 유모차 여행지 {len(destinations)}곳 1초 조회</h1>
     <p>
-      계단과 문턱 걱정 없이 <strong>휠체어·무릎 약한 부모님·유모차</strong>가 편안하게 산책할 수 있는 전국 무장애 평지 코스와<br>
-      <strong>엘리베이터·장애인 전용 객실·1층 조식 동선</strong>이 검증된 숙소를 한눈에 비교해 보세요.
+      방문할 관광지나 지역명을 검색하세요. <strong>장애인 주차장·경사로·휠체어 대여·장애인 화장실·수유실 유무</strong>를 1초 만에 조회할 수 있습니다.
     </p>
+    <div class="search-box">
+      <input type="search" id="spotSearchInput" placeholder="명소명·지역명·시설 검색 (예: 경주, 수목원, 유모차, 수유실)" oninput="searchAllSpots()">
+    </div>
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterSpots('ALL', this)">전체 보기</button>
-      <button class="filter-btn" onclick="filterSpots('휠체어추천', this)">🦽 휠체어 무장애 코스</button>
-      <button class="filter-btn" onclick="filterSpots('부모님효도', this)">👵 부모님 효도 평지여행</button>
-      <button class="filter-btn" onclick="filterSpots('유모차산책', this)">👶 유모차 나들이 명소</button>
-      <button class="filter-btn" onclick="filterSpots('무장애호텔', this)">🏨 무장애·엘리베이터 호텔</button>
+      <button class="filter-btn active" onclick="filterSpots('ALL', this)">전체 ({len(destinations)})</button>
+      <button class="filter-btn" onclick="filterSpots('휠체어추천', this)">🦽 휠체어 무장애</button>
+      <button class="filter-btn" onclick="filterSpots('부모님효도', this)">👵 부모님 효도</button>
+      <button class="filter-btn" onclick="filterSpots('유모차산책', this)">👶 유모차·수유실</button>
+      <button class="filter-btn" onclick="filterSpots('실내전시', this)">🏛️ 박물관·실내전시</button>
+      <button class="filter-btn" onclick="filterSpots('무장애호텔', this)">🏨 무장애 호텔</button>
     </div>
   </section>
 
   <main class="container">
+    <section style="margin-bottom:24px; padding:18px; background:#f0fdfa; border:1px solid #99f6e4; border-radius:16px;">
+      <h2 style="margin:0 0 12px 0; font-size:16.5px; color:#0f766e; font-weight:800;">🗺️ 시·도별 무장애 여행지 전체 모아보기</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        {region_links_html}
+      </div>
+    </section>
+
 {ad_top_html}
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
-      <h2 style="margin:0; font-size:21px; font-weight:800;">✨ 전국 검증된 무장애·효도·유모차 평지 여행 코스</h2>
-      <span style="font-size:13px; color:#64748b;">최종 업데이트: {escape(check_date_str)}</span>
+      <h2 id="gridHeading" style="margin:0; font-size:21px; font-weight:800;">✨ 추천 무장애·효도·유모차 평지 여행 코스</h2>
+      <span style="font-size:13px; color:#64748b;">총 {len(destinations)}개 명소 DB · 업데이트: {escape(check_date_str)}</span>
     </div>
     <div class="grid" id="spotsGrid">
       {cards}
+    </div>
+    <div id="loadMoreWrap" style="text-align:center; margin-top:24px;">
+      <button type="button" onclick="loadMoreSpots()" style="background:#0f766e; color:#ffffff; border:none; padding:12px 28px; border-radius:999px; font-weight:800; font-size:14.5px; cursor:pointer;">
+        ➕ 전국 무장애 명소 더 보기 ({len(destinations)}곳 전체 탐색)
+      </button>
     </div>
 
 {ad_mid_html}
@@ -1207,13 +1592,83 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
   </main>
 
   <script>
+    let allIndexData = null;
+    let activeTag = 'ALL';
+    let shownLimit = 36;
+
+    async function ensureSearchIndex() {{
+      if (allIndexData) return allIndexData;
+      try {{
+        const res = await fetch('/data/slow_search_index.json');
+        allIndexData = await res.json();
+      }} catch (e) {{
+        allIndexData = [];
+      }}
+      return allIndexData;
+    }}
+
+    function renderCards(items, limit) {{
+      const grid = document.getElementById('spotsGrid');
+      const slice = items.slice(0, limit);
+      if (!slice.length) {{
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; background:#fff; border-radius:16px; border:1px solid #e2e8f0;">검색 조건에 맞는 무장애 명소가 없습니다. 다른 지역명이나 키워드를 입력해 보세요.</div>';
+        document.getElementById('loadMoreWrap').style.display = 'none';
+        return;
+      }}
+      grid.innerHTML = slice.map(d => {{
+        const badges = (d.tags || []).slice(0, 3).map(t => `<span style="background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:999px;">#${{t}}</span>`).join('');
+        return `<article class="spot-card">
+          <a href="posts/${{d.slug}}.html" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <div style="height:190px; background:#e2e8f0 url('${{d.image}}') center/cover no-repeat; position:relative;">
+              <span style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); color:#5eead4; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px;">📍 ${{d.province}} · ${{d.city}}</span>
+              <span style="position:absolute; bottom:10px; right:10px; background:rgba(15,118,110,0.92); color:#fff; font-size:11.5px; font-weight:800; padding:3px 9px; border-radius:999px;">✔ ${{d.bf_cnt}}항목 확인</span>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">${{badges}}</div>
+              <h2 style="margin:0; font-size:18px; color:#0f172a; font-weight:800; line-height:1.4;">${{d.title}}</h2>
+              <p style="margin:0; font-size:13.5px; color:#475569; line-height:1.6;">${{d.summary}}</p>
+              <div style="margin-top:auto; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#0f766e;">
+                <span>⚡ 주차·경사로·화장실 유무 1초 조회</span><span>→</span>
+              </div>
+            </div>
+          </a>
+        </article>`;
+      }}).join('');
+      const wrap = document.getElementById('loadMoreWrap');
+      wrap.style.display = (items.length > limit) ? 'block' : 'none';
+    }}
+
+    async function applyFilters() {{
+      const data = await ensureSearchIndex();
+      const q = (document.getElementById('spotSearchInput').value || '').trim().toLowerCase();
+      const filtered = data.filter(d => {{
+        const tagMatch = activeTag === 'ALL' || (d.tags || []).includes(activeTag);
+        if (!tagMatch) return false;
+        if (!q) return true;
+        return (d.title + ' ' + d.province + ' ' + d.city + ' ' + d.addr + ' ' + (d.tags || []).join(' ')).toLowerCase().includes(q);
+      }});
+      document.getElementById('gridHeading').textContent = (q || activeTag !== 'ALL')
+        ? `🔍 검색/필터 결과: ${{filtered.length}}곳`
+        : '✨ 추천 무장애·효도·유모차 평지 여행 코스';
+      renderCards(filtered, shownLimit);
+    }}
+
     function filterSpots(tag, btn) {{
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('.spot-card').forEach(card => {{
-        const tags = card.getAttribute('data-tags') || '';
-        card.style.display = (tag === 'ALL' || tags.includes(tag)) ? 'block' : 'none';
-      }});
+      activeTag = tag;
+      shownLimit = 36;
+      applyFilters();
+    }}
+
+    function searchAllSpots() {{
+      shownLimit = 36;
+      applyFilters();
+    }}
+
+    function loadMoreSpots() {{
+      shownLimit += 36;
+      applyFilters();
     }}
   </script>
 </body>
@@ -1221,26 +1676,34 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
 """
 
 
-def build_seo_assets(destinations: list):
+def build_seo_assets(destinations: list, region_slugs: list = None):
     now_dt = datetime.now(KST)
-    now_iso = now_dt.strftime("%Y-%m-%d")
     now_lastmod = now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")
     now_rfc822 = format_datetime(now_dt)
 
-    urls = [
-        f"  <url>\n    <loc>{SITE_BASE_URL}/</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>"
-    ]
+    main_urls = [f"  <url>\n    <loc>{SITE_BASE_URL}/</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>"]
+    for rslug in (region_slugs or []):
+        main_urls.append(f"  <url>\n    <loc>{SITE_BASE_URL}/region/{rslug}.html</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.95</priority>\n  </url>")
+
+    tourism_urls, culture_urls, stay_urls = [], [], []
     rss_items = []
 
     for idx, d in enumerate(destinations):
         loc = f"{SITE_BASE_URL}/posts/{d['slug']}.html"
-        urls.append(
-            f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>"
-        )
-        item_pub = format_datetime(now_dt - timedelta(hours=idx))
-        cat_text = f"{d.get('province', '전국')} {d.get('city', '')}".strip()
-        rss_items.append(f"""    <item>
-      <title>{escape(d['title'])} 무장애·효도·유모차 평지 코스 &amp; 호텔 비교</title>
+        ctid = str(d.get("contentTypeId") or "12")
+        entry_xml = f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>"
+        if ctid == "32":
+            stay_urls.append(entry_xml)
+        elif ctid == "14":
+            culture_urls.append(entry_xml)
+        else:
+            tourism_urls.append(entry_xml)
+
+        if idx < 50:
+            item_pub = format_datetime(now_dt - timedelta(hours=idx))
+            cat_text = f"{d.get('province', '전국')} {d.get('city', '')}".strip()
+            rss_items.append(f"""    <item>
+      <title>{escape(d['title'])} 무장애 정보 · 주차·경사로·화장실 조회</title>
       <link>{escape(loc)}</link>
       <guid isPermaLink="true">{escape(loc)}</guid>
       <pubDate>{item_pub}</pubDate>
@@ -1248,17 +1711,27 @@ def build_seo_assets(destinations: list):
       <description>{escape(d['overview'])}</description>
     </item>""")
 
-    sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{chr(10).join(urls)}
-</urlset>
-"""
+    def wrap_urlset(u_list):
+        return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(u_list) + "\n</urlset>\n"
+
+    sub_maps = [("sitemap-main.xml", main_urls), ("sitemap-tourism.xml", tourism_urls), ("sitemap-culture.xml", culture_urls)]
+    if stay_urls:
+        sub_maps.append(("sitemap-stay.xml", stay_urls))
+
+    sitemap_index_entries = []
+    for fname, ulist in sub_maps:
+        with open(os.path.join(BASE_DIR, fname), "w", encoding="utf-8") as f:
+            f.write(wrap_urlset(ulist))
+        sitemap_index_entries.append(f"  <sitemap>\n    <loc>{SITE_BASE_URL}/{fname}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n  </sitemap>")
+
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(sitemap_index_entries) + "\n</sitemapindex>\n"
+
     rss_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>WizzTour Slow | 무장애·효도·유모차 평지 여행 가이드</title>
+    <title>WizzTour Slow | 무장애·효도·유모차 평지 여행 조회 포털</title>
     <link>{SITE_BASE_URL}/</link>
-    <description>계단 걱정 없는 휠체어·부모님 효도·유모차 평지 산책 코스 및 무장애 호텔 비교</description>
+    <description>전국 {len(destinations)}곳 장애인 주차장·경사로·휠체어 대여·화장실·수유실 유무 조회 포털</description>
     <language>ko</language>
     <lastBuildDate>{now_rfc822}</lastBuildDate>
     <atom:link href="{SITE_BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />
@@ -1272,10 +1745,30 @@ def build_seo_assets(destinations: list):
 </rss>
 """
     robots_txt = (
-        f"User-agent: *\n"
-        f"Allow: /\n"
+        f"# Robots.txt for WizzTour Slow ({SITE_BASE_URL})\n"
+        f"User-agent: *\nAllow: /\n\n"
+        f"User-agent: Yeti\nAllow: /\n"
+        f"User-agent: NaverSearchAdvisor\nAllow: /\n"
+        f"User-agent: GPTBot\nAllow: /\n"
+        f"User-agent: OAI-SearchBot\nAllow: /\n"
+        f"User-agent: PerplexityBot\nAllow: /\n"
+        f"User-agent: ClaudeBot\nAllow: /\n"
+        f"User-agent: Google-Extended\nAllow: /\n\n"
         f"Sitemap: {SITE_BASE_URL}/sitemap.xml\n"
+        f"# {SITE_BASE_URL}/llms.txt\n"
         f"{DAUM_WEBMASTER_PIN}\n"
+    )
+    sample_lines = "\n".join(
+        f"- **{d['title']} ({d['province']} {d['city']})**: 주차({d.get('barrier_free',{}).get('parking','확인')[:30]}) · URL: {SITE_BASE_URL}/posts/{d['slug']}.html"
+        for d in destinations[:15]
+    )
+    llms_txt = (
+        f"# WizzTour Slow (대한민국 무장애 · 부모님 효도 · 유모차 평지 여행 팩트 조회 포털)\n\n"
+        f"> WizzTour Slow({SITE_BASE_URL})는 한국관광공사 무장애 관광(KorWithService2) 공공데이터를 기반으로 전국 {len(destinations)}개 이상의 관광지·박물관·무장애 숙소의 장애인 주차장, 경사로, 휠체어 대여, 장애인 화장실, 수유실 유무를 1초 만에 조회할 수 있는 전문 포털입니다.\n\n"
+        f"## 주요 시·도별 허브 및 데이터\n"
+        + "\n".join(f"- [{r}.html]({SITE_BASE_URL}/region/{r}.html)" for r in (region_slugs or []))
+        + f"\n\n## 대표 무장애 여행지 샘플\n{sample_lines}\n\n"
+        f"## 사이트맵 (Sitemap Index)\n- {SITE_BASE_URL}/sitemap.xml\n"
     )
     ads_txt = "google.com, pub-9640565499370684, DIRECT, f08c47fec0942fa0\n"
 
@@ -1285,6 +1778,8 @@ def build_seo_assets(destinations: list):
         f.write(rss_xml)
     with open(os.path.join(BASE_DIR, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(robots_txt)
+    with open(os.path.join(BASE_DIR, "llms.txt"), "w", encoding="utf-8") as f:
+        f.write(llms_txt)
     with open(os.path.join(BASE_DIR, "ads.txt"), "w", encoding="utf-8") as f:
         f.write(ads_txt)
     with open(os.path.join(BASE_DIR, "CNAME"), "w", encoding="utf-8") as f:
@@ -1350,22 +1845,23 @@ def notify_google_and_search_engines(url_list: list):
 
 def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
     """
-    [매일 1건 자동 신규 발행 엔진]
-    한국관광공사 KorService2(관광지 목록) + KorWithService1(무장애 상세정보)를 조회하여
-    아직 발행되지 않은 전국 열린관광지·무장애 명소 1곳을 자동으로 발굴·생성합니다.
+    [매일 1건 자동 신규 발행 엔진 - KorWithService2]
+    한국관광공사 KorWithService2(관광지 12 / 문화시설 14 / 숙박 32)를 조회하여
+    아직 발행되지 않은 전국 무장애 명소 1곳을 자동으로 발굴·생성합니다.
     """
     if not SERVICE_KEY:
         return {}
-    area_Url = "https://apis.data.go.kr/B551011/KorService2/areaBasedList2"
+    area_Url = "https://apis.data.go.kr/B551011/KorWithService2/areaBasedList2"
+    ctid = random.choice(["12", "14", "32"])
     params = {
         "serviceKey": unquote(SERVICE_KEY),
         "numOfRows": 30,
-        "pageNo": random.randint(1, 5),
+        "pageNo": random.randint(1, 10),
         "MobileOS": "ETC",
         "MobileApp": "WizzTourSlow",
         "_type": "json",
         "arrange": "Q",
-        "contentTypeId": "12",  # 관광지
+        "contentTypeId": ctid,
     }
     try:
         r = requests.get(area_Url, params=params, verify=False, timeout=8)
@@ -1461,22 +1957,54 @@ def main():
     except Exception:
         pass
 
-    for d in destinations:
-        post_html = build_post_page_html(d, check_date_str)
+    for idx, d in enumerate(destinations):
+        is_fresh = (idx < 3 and bool(new_spot and str(d.get("contentid")) == str(new_spot.get("contentid"))))
+        post_html = build_post_page_html(d, check_date_str, all_destinations=destinations, is_live_refresh=is_fresh)
         out_path = os.path.join(POSTS_DIR, f"{d['slug']}.html")
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(post_html)
-        print(f"✅ [Slow 상세페이지 생성] {out_path}")
+    print(f"✅ [Slow 상세페이지 생성 완료] 총 {len(destinations)}건")
+
+    # 시·도별 지역 허브 페이지 생성
+    by_prov = {}
+    for d in destinations:
+        by_prov.setdefault(d.get("province", "전국"), []).append(d)
+    region_slugs = []
+    for prov, plist in by_prov.items():
+        rslug = get_province_slug(prov)
+        region_slugs.append(rslug)
+        reg_html = build_region_hub_html(prov, plist, check_date_str)
+        with open(os.path.join(REGION_DIR, f"{rslug}.html"), "w", encoding="utf-8") as f:
+            f.write(reg_html)
+    print(f"✅ [시·도별 지역 허브 생성 완료] 총 {len(region_slugs)}개 지역")
+
+    # 경량 통합 검색 인덱스(data/slow_search_index.json) 생성
+    search_index = [
+        {
+            "slug": d["slug"],
+            "title": d["title"],
+            "province": d.get("province", ""),
+            "city": d.get("city", ""),
+            "addr": d.get("addr", ""),
+            "image": d.get("image", ""),
+            "tags": d.get("category_tags") or [],
+            "bf_cnt": len(d.get("barrier_free") or {}),
+            "summary": (d.get("overview") or "")[:110] + "…",
+        }
+        for d in destinations
+    ]
+    with open(os.path.join(DATA_DIR, "slow_search_index.json"), "w", encoding="utf-8") as f:
+        json.dump(search_index, f, ensure_ascii=False)
 
     index_html = build_index_html(destinations, check_date_str)
     index_path = os.path.join(BASE_DIR, "index.html")
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(index_html)
 
-    build_seo_assets(destinations)
-    all_urls = [f"{SITE_BASE_URL}/"] + [f"{SITE_BASE_URL}/posts/{d['slug']}.html" for d in destinations]
+    build_seo_assets(destinations, region_slugs=region_slugs)
+    all_urls = [f"{SITE_BASE_URL}/"] + [f"{SITE_BASE_URL}/region/{r}.html" for r in region_slugs] + [f"{SITE_BASE_URL}/posts/{d['slug']}.html" for d in destinations]
     notify_google_and_search_engines(all_urls)
-    print(f"🎉 [WizzTour Slow 빌드 완료] index.html 및 상세 {len(destinations)}건, sitemap.xml, rss.xml, CNAME 생성 완료!")
+    print(f"🎉 [WizzTour Slow 빌드 완료] index.html, 지역허브 {len(region_slugs)}개, 상세 {len(destinations)}건, 분할 sitemap.xml, rss.xml, llms.txt 생성 완료!")
 
 
 if __name__ == "__main__":
