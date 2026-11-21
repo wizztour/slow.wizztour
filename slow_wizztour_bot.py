@@ -1599,7 +1599,7 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
     async function ensureSearchIndex() {{
       if (allIndexData) return allIndexData;
       try {{
-        const res = await fetch('/data/slow_search_index.json');
+        const res = await fetch('/assets/slow_search_index.json');
         allIndexData = await res.json();
       }} catch (e) {{
         allIndexData = [];
@@ -1993,7 +1993,7 @@ def main():
         }
         for d in destinations
     ]
-    with open(os.path.join(DATA_DIR, "slow_search_index.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(BASE_DIR, "assets", "slow_search_index.json"), "w", encoding="utf-8") as f:
         json.dump(search_index, f, ensure_ascii=False)
 
     index_html = build_index_html(destinations, check_date_str)

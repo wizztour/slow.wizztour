@@ -859,7 +859,7 @@
     async function ensureSearchIndex() {
       if (allIndexData) return allIndexData;
       try {
-        const res = await fetch('/data/slow_search_index.json');
+        const res = await fetch('/assets/slow_search_index.json');
         allIndexData = await res.json();
       } catch (e) {
         allIndexData = [];
