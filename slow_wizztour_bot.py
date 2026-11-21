@@ -276,6 +276,21 @@ def _load_slow_tripcom_city_ids() -> dict:
 _SLOW_TRIPCOM_CITY_IDS = _load_slow_tripcom_city_ids()
 
 
+def _load_slow_city_hotels_cache() -> dict:
+    p = os.path.join(DATA_DIR, "slow_city_hotels_cache.json")
+    if os.path.exists(p):
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+        except Exception:
+            pass
+    return {}
+
+
+SLOW_CITY_HOTELS_CACHE = _load_slow_city_hotels_cache()
+
+
 def _append_tripcom_affiliate_params(url: str) -> str:
     """트립닷컴 일반 URL에 직접 제휴 추적 파라미터(allianceid, sid, trip_sub1)를 안전하게 부착합니다."""
     if not url or "3ha.in" in url or "allianceid=" in url.lower():
@@ -285,6 +300,22 @@ def _append_tripcom_affiliate_params(url: str) -> str:
     if "curr=" not in url.lower():
         extra += "&curr=KRW&locale=ko-KR"
     return f"{url}{sep}allianceid={TRIPCOM_ALLIANCE_ID}&sid={TRIPCOM_SID}&trip_sub1=slow_wizztour{extra}"
+
+
+def resolve_tripcom_specific_hotel_url(hotel_name: str, city: str, province: str = "", tc_cid: str = "", tc_hid: str = "") -> str:
+    city_clean = (city or "").strip()
+    prov_clean = (province or "").strip()
+    cid = str(tc_cid or _SLOW_TRIPCOM_CITY_IDS.get(city_clean) or _SLOW_TRIPCOM_CITY_IDS.get(prov_clean) or "").strip()
+    hid = str(tc_hid or "").strip()
+    hname = (hotel_name or city_clean or prov_clean).strip()
+    if cid and hid and hname:
+        sv = quote(f"31|{hid}*31*{hid}*1")
+        return (
+            f"https://kr.trip.com/hotels/list?flexType=1&fixedDate=0&cityId={cid}&countryId=42"
+            f"&cityName={quote(city_clean or prov_clean)}&searchWord={quote(hname)}&searchType=H&optionId={hid}&searchValue={sv}"
+            f"&curr=KRW&locale=ko-KR&allianceid={TRIPCOM_ALLIANCE_ID}&sid={TRIPCOM_SID}&trip_sub1=slow_wizztour"
+        )
+    return resolve_hotel_affiliate_url(city, province)
 
 
 def resolve_hotel_affiliate_url(city: str, province: str = "", custom_keyword: str = "") -> str:
@@ -885,17 +916,13 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
     - KTO 공식 숙박 사진(hotel_cards) 캐시 보유 시 실존 호텔 카드 함께 노출
     """
     tripcom_url = resolve_hotel_affiliate_url(city, province)
+    hotel_cards = (dest or {}).get("hotel_cards") or SLOW_CITY_HOTELS_CACHE.get((city or "").strip()) or SLOW_CITY_HOTELS_CACHE.get((province or "").strip()) or []
     subarea_kw, subarea_label = extract_nearby_subarea(dest or {"title": title, "city": city})
-    zone_keywords = [
-        subarea_kw or city,
-        f"{city} 리조트" if city else "",
-        f"{city} 호텔" if city else "",
-    ]
     tbody_rows = ""
     btn_colors = ["#0f766e", "#2563eb", "#ea580c"]
     btn_labels = [
         f"{subarea_label or city} 인접 호텔 보기",
-        f"{city} 가족 리조트·콘도 보기",
+        f"{city} 추천 숙소·리조트 보기",
         f"{city} 역세권·가성비 호텔 보기",
     ]
 
@@ -903,8 +930,19 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
         bg = "#ffffff" if i % 2 == 0 else "#f8fafc"
         color = btn_colors[i % len(btn_colors)]
         b_label = btn_labels[i % len(btn_labels)]
-        row_kw = zone_keywords[i] if i < len(zone_keywords) else city
-        row_url = resolve_hotel_affiliate_url(city, province, custom_keyword=row_kw)
+        real_hc = hotel_cards[i] if i < len(hotel_cards) else None
+        if real_hc and real_hc.get("title"):
+            row_url = resolve_tripcom_specific_hotel_url(
+                real_hc["title"], city, province,
+                tc_cid=real_hc.get("tripcom_city_id", ""),
+                tc_hid=real_hc.get("tripcom_hotel_id", ""),
+            )
+            display_hotel_name = real_hc["title"]
+            if real_hc.get("tripcom_hotel_id"):
+                b_label = f"{display_hotel_name[:12]} 바로 보기"
+        else:
+            row_url = resolve_hotel_affiliate_url(city, province)
+            display_hotel_name = h.get("name", "")
         type_txt = h.get("type", "")
         if i == 0 and subarea_label and subarea_kw != city:
             type_txt = f"① {subarea_label} 인접 무장애·특급 호텔"
@@ -912,7 +950,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
         <tr style="background:{bg};">
           <td style="padding:11px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f172a;">
             {escape(type_txt)}<br>
-            <span style="font-size:12.5px; color:#0f766e;">({escape(h.get('name', ''))})</span>
+            <span style="font-size:12.5px; color:#0f766e;">({escape(display_hotel_name)})</span>
           </td>
           <td style="padding:11px 12px; border:1px solid #e2e8f0; color:#334155;">
             {escape(h.get('features', ''))}
@@ -930,14 +968,17 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
         """.strip()
 
     stay_cards_html = ""
-    hotel_cards = (dest or {}).get("hotel_cards") or []
     if hotel_cards:
         hc_items = ""
         for hc in hotel_cards[:3]:
             hc_title = str(hc.get("title") or "")
             hc_img = str(hc.get("image") or "").replace("http://", "https://")
             hc_addr = str(hc.get("addr") or city)
-            hc_url = resolve_hotel_affiliate_url(city, province, custom_keyword=hc_title)
+            hc_url = resolve_tripcom_specific_hotel_url(
+                hc_title, city, province,
+                tc_cid=hc.get("tripcom_city_id", ""),
+                tc_hid=hc.get("tripcom_hotel_id", ""),
+            )
             img_tag = f'<img src="{escape(hc_img)}" alt="{escape(hc_title)}" loading="lazy" style="width:100%; height:136px; object-fit:cover; display:block;">' if hc_img else ""
             hc_items += f"""
         <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; overflow:hidden; display:flex; flex-direction:column;">
