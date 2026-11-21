@@ -56,6 +56,8 @@ AD_SLOT_TOP = "3911475090"     # slow 상단
 AD_SLOT_MID = "6591102613"     # slow 중간
 AD_SLOT_BOTTOM = "5109006694"  # slow 하단
 COUPANG_AF_ID = os.environ.get("COUPANG_AF_ID") or "AF2307983"
+TRIPCOM_ALLIANCE_ID = os.environ.get("TRIPCOM_ALLIANCE_ID") or "6574450"
+TRIPCOM_SID = os.environ.get("TRIPCOM_SID") or "336748469"
 SERVICE_KEY = os.environ.get("TOUR_API_KEY") or os.environ.get("PUBLIC_DATA_API_KEY") or ""
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
 GPT_API_KEY = os.environ.get("OPENAI_API_KEY") or ""
@@ -248,12 +250,21 @@ def load_region_affiliate_links() -> dict:
 AFFILIATE_LINKS = load_region_affiliate_links()
 
 
+def _append_tripcom_affiliate_params(url: str) -> str:
+    """트립닷컴 일반 URL에 직접 제휴 추적 파라미터(Allianceid, SID, trip_sub1)를 안전하게 부착합니다."""
+    if not url or "3ha.in" in url or "allianceid=" in url.lower():
+        return url
+    sep = "&" if "?" in url else "?"
+    return f"{url}{sep}Allianceid={TRIPCOM_ALLIANCE_ID}&SID={TRIPCOM_SID}&trip_sub1=slow_wizztour"
+
+
 def resolve_hotel_affiliate_url(city: str, province: str = "") -> str:
     h_map = AFFILIATE_LINKS.get("hotel") or {}
     for key in (city, province):
         if key and h_map.get(key):
-            return h_map[key]
-    return f"https://kr.trip.com/hotels/list?keyword={quote(city)}"
+            return _append_tripcom_affiliate_params(h_map[key])
+    kw = (city or province or "한국").strip()
+    return _append_tripcom_affiliate_params(f"https://kr.trip.com/hotels/list?keyword={quote(kw)}")
 
 
 # ==============================================================================
