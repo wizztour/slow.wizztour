@@ -71,6 +71,49 @@ PROVINCE_SLUG_MAP = {
     "광주": "gwangju", "제주": "jeju", "전국": "all",
 }
 
+BASELINE_UPDATED_AT = "2026-11-21T16:50:00+09:00"
+BASELINE_CHECK_DATE = "2026년 11월 21일"
+
+_PROVINCE_ALIAS_MAP = {
+    "서울특별시": "서울", "서울시": "서울", "서울": "서울",
+    "부산광역시": "부산", "부산시": "부산", "부산": "부산",
+    "대구광역시": "대구", "대구시": "대구", "대구": "대구",
+    "인천광역시": "인천", "인천시": "인천", "인천": "인천",
+    "광주광역시": "광주", "광주시": "광주", "광주": "광주",
+    "대전광역시": "대전", "대전시": "대전", "대전": "대전",
+    "울산광역시": "울산", "울산시": "울산", "울산": "울산",
+    "세종특별자치시": "세종", "세종시": "세종", "세종": "세종",
+    "경기도": "경기", "경기": "경기",
+    "강원특별자치도": "강원", "강원도": "강원", "강원": "강원",
+    "충청북도": "충북", "충북": "충북",
+    "충청남도": "충남", "충남": "충남",
+    "전북특별자치도": "전북", "전라북도": "전북", "전북": "전북",
+    "전라남도": "전남", "전남": "전남",
+    "경상북도": "경북", "경북": "경북",
+    "경상남도": "경남", "경남": "경남",
+    "제주특별자치도": "제주", "제주도": "제주", "제주": "제주",
+}
+
+
+def normalize_province(raw_token: str) -> str:
+    token = (raw_token or "").strip()
+    if token in _PROVINCE_ALIAS_MAP:
+        return _PROVINCE_ALIAS_MAP[token]
+    for prefix, norm in _PROVINCE_ALIAS_MAP.items():
+        if token.startswith(prefix[:2]) and prefix[:2] in PROVINCE_SLUG_MAP:
+            return norm
+    return token[:2] if len(token) >= 2 and token[:2] in PROVINCE_SLUG_MAP else "전국"
+
+
+def _parse_iso_kst(iso_str: str, fallback: datetime) -> datetime:
+    if not iso_str:
+        return fallback
+    try:
+        dt = datetime.fromisoformat(str(iso_str).strip())
+        return dt if dt.tzinfo else dt.replace(tzinfo=KST)
+    except Exception:
+        return fallback
+
 
 def get_province_slug(prov: str) -> str:
     return PROVINCE_SLUG_MAP.get(prov, "etc")
@@ -1095,15 +1138,16 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
     else:
         seo_title = f"{title} 무장애 정보 | {badge_str} 조회 ({province} {city}) - WizzTour Slow"
 
-    meta_desc = f"✅ 1초 확인 ({check_date_str} 기준): {province} {city} {title}의 {badge_str} 상세 위치, KTO 혼잡도 골든타임, 계단 없는 평지 산책 코스 및 엘리베이터·장애인객실 호텔 비교 가이드."
+    meta_desc = f"✅ 1초 확인 ({dest.get('checked_date') or check_date_str} 기준): {province} {city} {title}의 {badge_str} 상세 위치, KTO 혼잡도 골든타임, 계단 없는 평지 산책 코스 및 엘리베이터·장애인객실 호텔 비교 가이드."
 
+    spot_check_date = dest.get("checked_date") or check_date_str
     spec_table_html = make_quick_spec_table_html(dest, merged_bf)
     coupang_box_html = make_coupang_care_box_html(dest, merged_bf)
-    pictogram_html = make_barrier_free_pictogram_card_html(title, merged_bf, check_date_str)
+    pictogram_html = make_barrier_free_pictogram_card_html(title, merged_bf, spot_check_date)
     crowd_food_html = make_crowd_and_food_care_box_html(dest, allow_live_api=is_live_refresh)
-    overview_html = generate_slow_persuasion_overview(dest, check_date_str, allow_ai=is_live_refresh)
+    overview_html = generate_slow_persuasion_overview(dest, spot_check_date, allow_ai=is_live_refresh)
     flat_route_html = make_slow_flat_route_html(title, city, dest.get("flat_route") or [])
-    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], check_date_str, province=province)
+    hotel_table_html = make_slow_hotel_comparison_html(title, city, dest.get("hotels") or [], spot_check_date, province=province)
     usim_tour_html = make_usim_and_tour_affiliate_box_html(city)
     related_html = make_related_spots_html(dest, all_destinations or [])
 
@@ -1233,7 +1277,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
         📢 세시간전 크리에이터 활동을 통해 수익이 발생하는 링크가 포함되어 있습니다. 해당 링크를 통해 상품을 구매할 경우 수수료가 지급됩니다.
       </div>
       <p style="font-size:13.5px; color:#64748b; margin:0 0 16px 0;">
-        📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(check_date_str)} (한국관광공사 열린관광·KorWithService2·집중률 API 기준)
+        📍 위치: {escape(dest.get('addr', ''))} &nbsp;|&nbsp; 📅 데이터 확인일: {escape(spot_check_date)} (한국관광공사 열린관광·KorWithService2·집중률 API 기준)
       </p>
 
       <div style="background:#ecfdf5; border-left:4px solid #0d9488; padding:14px 16px; border-radius:8px; font-weight:700; color:#065f46; margin-bottom:20px;">
@@ -1686,23 +1730,34 @@ def build_seo_assets(destinations: list, region_slugs: list = None):
         main_urls.append(f"  <url>\n    <loc>{SITE_BASE_URL}/region/{rslug}.html</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.95</priority>\n  </url>")
 
     tourism_urls, culture_urls, stay_urls = [], [], []
-    rss_items = []
+    max_lastmod = {"sitemap-main.xml": now_lastmod, "sitemap-tourism.xml": BASELINE_UPDATED_AT, "sitemap-culture.xml": BASELINE_UPDATED_AT, "sitemap-stay.xml": BASELINE_UPDATED_AT}
 
-    for idx, d in enumerate(destinations):
+    for d in destinations:
         loc = f"{SITE_BASE_URL}/posts/{d['slug']}.html"
         ctid = str(d.get("contentTypeId") or "12")
-        entry_xml = f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>"
+        spot_lastmod = d.get("updated_at") or BASELINE_UPDATED_AT
+        entry_xml = f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{escape(spot_lastmod)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>"
         if ctid == "32":
             stay_urls.append(entry_xml)
+            if spot_lastmod > max_lastmod["sitemap-stay.xml"]:
+                max_lastmod["sitemap-stay.xml"] = spot_lastmod
         elif ctid == "14":
             culture_urls.append(entry_xml)
+            if spot_lastmod > max_lastmod["sitemap-culture.xml"]:
+                max_lastmod["sitemap-culture.xml"] = spot_lastmod
         else:
             tourism_urls.append(entry_xml)
+            if spot_lastmod > max_lastmod["sitemap-tourism.xml"]:
+                max_lastmod["sitemap-tourism.xml"] = spot_lastmod
 
-        if idx < 50:
-            item_pub = format_datetime(now_dt - timedelta(hours=idx))
-            cat_text = f"{d.get('province', '전국')} {d.get('city', '')}".strip()
-            rss_items.append(f"""    <item>
+    rss_sorted = sorted(destinations, key=lambda d: d.get("updated_at") or BASELINE_UPDATED_AT, reverse=True)[:50]
+    rss_items = []
+    for d in rss_sorted:
+        loc = f"{SITE_BASE_URL}/posts/{d['slug']}.html"
+        item_dt = _parse_iso_kst(d.get("updated_at") or BASELINE_UPDATED_AT, now_dt)
+        item_pub = format_datetime(item_dt)
+        cat_text = f"{d.get('province', '전국')} {d.get('city', '')}".strip()
+        rss_items.append(f"""    <item>
       <title>{escape(d['title'])} 무장애 정보 · 주차·경사로·화장실 조회</title>
       <link>{escape(loc)}</link>
       <guid isPermaLink="true">{escape(loc)}</guid>
@@ -1722,7 +1777,8 @@ def build_seo_assets(destinations: list, region_slugs: list = None):
     for fname, ulist in sub_maps:
         with open(os.path.join(BASE_DIR, fname), "w", encoding="utf-8") as f:
             f.write(wrap_urlset(ulist))
-        sitemap_index_entries.append(f"  <sitemap>\n    <loc>{SITE_BASE_URL}/{fname}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n  </sitemap>")
+        sub_lastmod = max_lastmod.get(fname) or now_lastmod
+        sitemap_index_entries.append(f"  <sitemap>\n    <loc>{SITE_BASE_URL}/{fname}</loc>\n    <lastmod>{escape(sub_lastmod)}</lastmod>\n  </sitemap>")
 
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(sitemap_index_entries) + "\n</sitemapindex>\n"
 
@@ -1843,16 +1899,70 @@ def notify_google_and_search_engines(url_list: list):
         print(f"[IndexNow 참고] {e}")
 
 
-def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
+def _build_discovered_spot_entry(it: dict, ctid: str, bf: dict, now_iso: str, check_date_str: str) -> dict:
+    cid = str(it.get("contentid") or "").strip()
+    title = str(it.get("title") or "").strip()
+    addr = str(it.get("addr1") or "").strip()
+    img = str(it.get("firstimage") or "").strip()
+    parts = addr.split()
+    province = normalize_province(parts[0]) if parts else "전국"
+    city = parts[1].rstrip("시군구") if len(parts) > 1 else province
+    slug = f"spot-{cid}-barrier-free"
+    tags = (
+        ["무장애숙소", "휠체어객실", "엘리베이터", "효도숙소"]
+        if ctid == "32"
+        else ["휠체어추천", "부모님효도", "유모차산책", "열린관광지"]
+    )
+    return {
+        "contentid": cid,
+        "contentTypeId": ctid,
+        "slug": slug,
+        "title": title,
+        "city": city,
+        "province": province,
+        "addr": addr,
+        "category_tags": tags,
+        "image": img.replace("http://", "https://"),
+        "overview": f"{title}은(는) 한국관광공사 무장애 여행정보(KorWithService2)에서 장애인 주차장·접근로·화장실 등 주요 보행 편의시설이 확인된 {city} 대표 {'무장애 숙소' if ctid == '32' else '나들이 명소'}입니다.",
+        "local_food": f"{city} 1층 평지 입식 향토 한정식 & 가족 식당",
+        "crowd_prediction": {
+            "golden_time": "오전 09:30 ~ 11:30 (주차 및 관람 동선 여유)",
+            "peak_time": "오후 14:00 ~ 16:30 (주말 방문객 집중 시간대)",
+            "weekday_score": "쾌적",
+            "weekend_tip": "오전 일찍 방문하시면 장애인 전용 주차구역 및 매표소 진입이 훨씬 수월합니다.",
+        },
+        "barrier_free": bf,
+        "flat_route": [
+            {"time": "오전 10:30", "place": f"{title} 장애인주차장 하차 → 무장애 주 관람로 산책", "note": "단차가 적은 주 출입구와 평지 동선 중심 관람"},
+            {"time": "점심 12:30", "place": f"{city} 인근 1층 평지 입식 맛집", "note": "계단 없는 1층 테이블 좌석 식당"},
+            {"time": "오후 14:30", "place": f"{city} 전망 좋은 대형 엘리베이터 카페", "note": "주차가 편하고 화장실이 쾌적한 베이커리 카페"},
+            {"time": "저녁 17:30", "place": f"{city} 엘리베이터·장애인객실 보유 호텔 체크인", "note": "무리한 이동 없이 편안한 호텔 휴식"},
+        ],
+        "hotels": [
+            {"name": f"{city} 중심권 4~5성급 무장애·특급 호텔", "type": "① 엘리베이터·장애인객실 보유 호텔", "features": "장애인 전용 객실 · 넓은 엘리베이터 · 1층 조식 뷔페"},
+            {"name": f"{city} 가족형 리조트·콘도", "type": "② 3~4인 부모님 효도·가족 리조트", "features": "넓은 거실형 패밀리룸 · 단지 내 평지 산책로"},
+            {"name": f"{city} 역세권·시내 신축 비즈니스 호텔", "type": "③ 무료취소 & 가성비 신축 호텔", "features": "문턱 없는 신축 객실 · 합리적인 요금 및 무료취소"},
+        ],
+        "updated_at": now_iso,
+        "checked_date": check_date_str,
+    }
+
+
+def discover_new_kto_barrier_free_spots(existing_ids: set, now_iso: str = None, check_date_str: str = None, limit: int = 2) -> list:
     """
-    [매일 1건 자동 신규 발행 엔진 - KorWithService2]
-    한국관광공사 KorWithService2(관광지 12 / 문화시설 14 / 숙박 32)를 조회하여
-    아직 발행되지 않은 전국 무장애 명소 1곳을 자동으로 발굴·생성합니다.
+    [매일 최대 N건 자동 신규 발굴 엔진 - KorWithService2]
+    한국관광공사 KorWithService2(숙박 32 우선 가중치 / 관광지 12 / 문화시설 14)를 조회하여
+    아직 발행되지 않은 전국 무장애 명소·숙소를 자동으로 발굴합니다.
     """
     if not SERVICE_KEY:
-        return {}
-    area_Url = "https://apis.data.go.kr/B551011/KorWithService2/areaBasedList2"
-    ctid = random.choice(["12", "14", "32"])
+        return []
+    now_dt = datetime.now(KST)
+    now_iso = now_iso or now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+    check_date_str = check_date_str or now_dt.strftime("%Y년 %m월 %d일")
+
+    area_url = "https://apis.data.go.kr/B551011/KorWithService2/areaBasedList2"
+    ctid = random.choice(["32", "32", "12", "14"])
+    found = []
     params = {
         "serviceKey": unquote(SERVICE_KEY),
         "numOfRows": 30,
@@ -1864,9 +1974,9 @@ def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
         "contentTypeId": ctid,
     }
     try:
-        r = requests.get(area_Url, params=params, verify=False, timeout=8)
+        r = requests.get(area_url, params=params, verify=False, timeout=8)
         if r.status_code != 200:
-            return {}
+            return []
         items = (((r.json().get("response") or {}).get("body") or {}).get("items") or {}).get("item", [])
         if isinstance(items, dict):
             items = [items]
@@ -1878,78 +1988,134 @@ def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
             if not cid or cid in existing_ids or not title or not addr or not img:
                 continue
             bf = fetch_kto_barrier_free_detail(cid)
-            # 무장애 항목이 최소 3개 이상 확인된 곳만 채택
-            valid_bf_cnt = sum(1 for k in ("parking", "route", "wheelchair", "restroom", "elevator", "stroller") if bf.get(k))
-            if valid_bf_cnt < 3:
+            min_req = 2 if ctid == "32" else 3
+            valid_bf_cnt = sum(1 for k in ("parking", "route", "wheelchair", "restroom", "elevator", "stroller", "room") if bf.get(k))
+            if valid_bf_cnt < min_req:
                 continue
-            parts = addr.split()
-            province = parts[0][:2] if parts else "전국"
-            city = parts[1].rstrip("시군구") if len(parts) > 1 else province
-            slug = f"spot-{cid}-barrier-free"
-            return {
-                "contentid": cid,
-                "slug": slug,
-                "title": title,
-                "city": city,
-                "province": province,
-                "addr": addr,
-                "category_tags": ["휠체어추천", "부모님효도", "유모차산책", "열린관광지"],
-                "image": img.replace("http://", "https://"),
-                "overview": f"{title}은(는) 한국관광공사 무장애 여행정보(KorWithService1)에서 장애인 주차장·접근로·화장실 등 주요 보행 편의시설이 확인된 {city} 대표 나들이 명소입니다.",
-                "local_food": f"{city} 1층 평지 입식 향토 한정식 & 가족 식당",
-                "crowd_prediction": {
-                    "golden_time": "오전 09:30 ~ 11:30 (주차 및 관람 동선 여유)",
-                    "peak_time": "오후 14:00 ~ 16:30 (주말 방문객 집중 시간대)",
-                    "weekday_score": "쾌적",
-                    "weekend_tip": "오전 일찍 방문하시면 장애인 전용 주차구역 및 매표소 진입이 훨씬 수월합니다."
-                },
-                "barrier_free": bf,
-                "flat_route": [
-                    {"time": "오전 10:30", "place": f"{title} 장애인주차장 하차 → 무장애 주 관람로 산책", "note": "단차가 적은 주 출입구와 평지 동선 중심 관람"},
-                    {"time": "점심 12:30", "place": f"{city} 인근 1층 평지 입식 맛집", "note": "계단 없는 1층 테이블 좌석 식당"},
-                    {"time": "오후 14:30", "place": f"{city} 전망 좋은 대형 엘리베이터 카페", "note": "주차가 편하고 화장실이 쾌적한 베이커리 카페"},
-                    {"time": "저녁 17:30", "place": f"{city} 엘리베이터·장애인객실 보유 호텔 체크인", "note": "무리한 이동 없이 편안한 호텔 휴식"}
-                ],
-                "hotels": [
-                    {"name": f"{city} 중심권 4~5성급 무장애·특급 호텔", "type": "① 엘리베이터·장애인객실 보유 호텔", "features": "장애인 전용 객실 · 넓은 엘리베이터 · 1층 조식 뷔페"},
-                    {"name": f"{city} 가족형 리조트·콘도", "type": "② 3~4인 부모님 효도·가족 리조트", "features": "넓은 거실형 패밀리룸 · 단지 내 평지 산책로"},
-                    {"name": f"{city} 역세권·시내 신축 비즈니스 호텔", "type": "③ 무료취소 & 가성비 신축 호텔", "features": "문턱 없는 신축 객실 · 합리적인 요금 및 무료취소"}
-                ]
-            }
+            existing_ids.add(cid)
+            found.append(_build_discovered_spot_entry(it, ctid, bf, now_iso, check_date_str))
+            if len(found) >= limit:
+                break
     except Exception as e:
         print(f"[신규 무장애 명소 자동 발굴 참고] {e}")
-    return {}
+    return found
+
+
+def discover_new_kto_barrier_free_spot(existing_ids: set) -> dict:
+    """단건 발굴 하위 호환 래퍼"""
+    picks = discover_new_kto_barrier_free_spots(existing_ids, limit=1)
+    return picks[0] if picks else {}
+
+
+def refresh_oldest_destinations(destinations: list, now_dt: datetime, check_date_str: str, batch_size: int = 20, exclude_ids: set = None) -> set:
+    """
+    [매일 20건 순환 팩트 갱신(Rolling Refresh) 엔진]
+    updated_at이 가장 오래된 N곳만 골라 KTO 무장애 상세·집중률 API로 최신 상태를 점검·병합하고
+    updated_at/checked_date를 오늘로 갱신하여 진짜 수정된 페이지만 HTML/sitemap/색인에 반영합니다.
+    """
+    if not SERVICE_KEY or not destinations:
+        return set()
+    exclude_ids = exclude_ids or set()
+    candidates = [
+        d for d in destinations
+        if str(d.get("contentid") or "") and str(d.get("contentid") or "") not in exclude_ids
+    ]
+    candidates.sort(key=lambda d: (d.get("updated_at") or BASELINE_UPDATED_AT, str(d.get("contentid") or "")))
+
+    now_iso = now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+    refreshed_ids = set()
+    for d in candidates[:batch_size]:
+        cid = str(d.get("contentid") or "")
+        live_bf = fetch_kto_barrier_free_detail(cid)
+        bf = dict(d.get("barrier_free") or {})
+        for k, v in (live_bf or {}).items():
+            if k not in ("contentid", "contenttypeid") and v and str(v).strip() not in ("", "없음"):
+                bf[k] = str(v).strip()
+        d["barrier_free"] = bf
+
+        live_crowd = fetch_kto_crowd_prediction(d.get("city", ""), d.get("title", ""))
+        if live_crowd.get("live_cnctr_rate"):
+            d.setdefault("crowd_prediction", {})["weekday_score"] = live_crowd["live_cnctr_rate"]
+
+        d["updated_at"] = now_iso
+        d["checked_date"] = check_date_str
+        refreshed_ids.add(cid)
+    return refreshed_ids
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--build-once", action="store_true", help="정적 사이트 전체 빌드 실행")
+    parser.add_argument("--build-once", action="store_true", help="증분 정적 사이트 빌드 실행")
+    parser.add_argument("--force-all", action="store_true", help="모든 상세 HTML을 강제 재생성")
     args = parser.parse_args()
 
-    check_date_str = datetime.now(KST).strftime("%Y년 %m월 %d일")
-    destinations = list(VERIFIED_BARRIER_FREE_DESTINATIONS)
-    existing_ids = {str(d.get("contentid")) for d in destinations}
+    now_dt = datetime.now(KST)
+    now_iso = now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+    check_date_str = now_dt.strftime("%Y년 %m월 %d일")
 
-    # 기존 누적 DB 로드
+    saved_map = {}
+    saved_order = []
     if os.path.exists(CACHE_FILE):
         try:
             with open(CACHE_FILE, "r", encoding="utf-8") as cf:
                 saved_list = json.load(cf)
                 if isinstance(saved_list, list):
                     for item in saved_list:
-                        cid = str(item.get("contentid") or "")
-                        if cid and cid not in existing_ids:
-                            destinations.append(item)
-                            existing_ids.add(cid)
+                        cid = str(item.get("contentid") or "").strip()
+                        if cid and cid not in saved_map:
+                            saved_map[cid] = item
+                            saved_order.append(item)
         except Exception:
             pass
 
-    # 매일 실행 시 KTO 무장애 API에서 신규 여행지 1건 자동 추가 발굴
-    new_spot = discover_new_kto_barrier_free_spot(existing_ids)
-    if new_spot:
-        destinations.insert(0, new_spot)
-        existing_ids.add(str(new_spot["contentid"]))
-        print(f"✨ [신규 무장애 여행지 자동 발굴 추가] {new_spot['title']} ({new_spot['city']})")
+    destinations = []
+    existing_ids = set()
+    for seed in VERIFIED_BARRIER_FREE_DESTINATIONS:
+        d = dict(seed)
+        cid = str(d.get("contentid") or "").strip()
+        prev = saved_map.get(cid)
+        if prev:
+            for k in ("updated_at", "checked_date"):
+                if prev.get(k):
+                    d[k] = prev[k]
+            if isinstance(prev.get("barrier_free"), dict):
+                merged = dict(prev["barrier_free"])
+                merged.update(d.get("barrier_free") or {})
+                d["barrier_free"] = merged
+            if isinstance(prev.get("crowd_prediction"), dict):
+                cp = dict(d.get("crowd_prediction") or {})
+                cp.update(prev["crowd_prediction"])
+                d["crowd_prediction"] = cp
+        destinations.append(d)
+        existing_ids.add(cid)
+
+    for item in saved_order:
+        cid = str(item.get("contentid") or "").strip()
+        if cid and cid not in existing_ids:
+            destinations.append(item)
+            existing_ids.add(cid)
+
+    # 기존 항목 중 updated_at/checked_date 누락분만 초기 기준값으로 백필 (매일 일괄 리셋 방지)
+    for d in destinations:
+        if not d.get("updated_at"):
+            d["updated_at"] = BASELINE_UPDATED_AT
+        if not d.get("checked_date"):
+            d["checked_date"] = BASELINE_CHECK_DATE
+
+    # 1) 매일 KTO 무장애 API에서 신규 여행지·숙소 최대 2건 자동 발굴
+    new_spots = discover_new_kto_barrier_free_spots(existing_ids, now_iso=now_iso, check_date_str=check_date_str, limit=2)
+    new_ids = set()
+    for ns in reversed(new_spots):
+        destinations.insert(0, ns)
+        cid = str(ns["contentid"])
+        existing_ids.add(cid)
+        new_ids.add(cid)
+        print(f"✨ [신규 무장애 자동 발굴 추가] {ns['title']} ({ns['city']}, type={ns.get('contentTypeId')})")
+
+    # 2) 가장 오래된 20건 순환 팩트 갱신(Rolling Refresh)
+    refreshed_ids = refresh_oldest_destinations(destinations, now_dt, check_date_str, batch_size=20, exclude_ids=new_ids)
+    if refreshed_ids:
+        print(f"🔄 [Rolling Refresh 완료] 가장 오래된 {len(refreshed_ids)}건 KTO API 팩트·확인일 최신화")
 
     try:
         with open(CACHE_FILE, "w", encoding="utf-8") as cf:
@@ -1957,13 +2123,18 @@ def main():
     except Exception:
         pass
 
-    for idx, d in enumerate(destinations):
-        is_fresh = (idx < 3 and bool(new_spot and str(d.get("contentid")) == str(new_spot.get("contentid"))))
-        post_html = build_post_page_html(d, check_date_str, all_destinations=destinations, is_live_refresh=is_fresh)
+    changed_ids = new_ids | refreshed_ids
+    written_posts = 0
+    for d in destinations:
+        cid = str(d.get("contentid") or "")
         out_path = os.path.join(POSTS_DIR, f"{d['slug']}.html")
-        with open(out_path, "w", encoding="utf-8") as f:
-            f.write(post_html)
-    print(f"✅ [Slow 상세페이지 생성 완료] 총 {len(destinations)}건")
+        if args.force_all or cid in changed_ids or not os.path.exists(out_path):
+            is_fresh = cid in new_ids
+            post_html = build_post_page_html(d, check_date_str, all_destinations=destinations, is_live_refresh=is_fresh)
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(post_html)
+            written_posts += 1
+    print(f"✅ [Slow 상세페이지 빌드 완료] 전체 {len(destinations)}건 중 {written_posts}건 생성/갱신 (force_all={args.force_all})")
 
     # 시·도별 지역 허브 페이지 생성
     by_prov = {}
@@ -1978,7 +2149,7 @@ def main():
             f.write(reg_html)
     print(f"✅ [시·도별 지역 허브 생성 완료] 총 {len(region_slugs)}개 지역")
 
-    # 경량 통합 검색 인덱스(data/slow_search_index.json) 생성
+    # 경량 통합 검색 인덱스(assets/slow_search_index.json) 생성
     search_index = [
         {
             "slug": d["slug"],
@@ -2002,9 +2173,14 @@ def main():
         f.write(index_html)
 
     build_seo_assets(destinations, region_slugs=region_slugs)
-    all_urls = [f"{SITE_BASE_URL}/"] + [f"{SITE_BASE_URL}/region/{r}.html" for r in region_slugs] + [f"{SITE_BASE_URL}/posts/{d['slug']}.html" for d in destinations]
-    notify_google_and_search_engines(all_urls)
-    print(f"🎉 [WizzTour Slow 빌드 완료] index.html, 지역허브 {len(region_slugs)}개, 상세 {len(destinations)}건, 분할 sitemap.xml, rss.xml, llms.txt 생성 완료!")
+    changed_urls = [
+        f"{SITE_BASE_URL}/posts/{d['slug']}.html"
+        for d in destinations
+        if str(d.get("contentid") or "") in changed_ids
+    ]
+    notify_urls = changed_urls + [f"{SITE_BASE_URL}/"] + [f"{SITE_BASE_URL}/region/{r}.html" for r in region_slugs[:5]]
+    notify_google_and_search_engines(notify_urls)
+    print(f"🎉 [WizzTour Slow 빌드 완료] index.html, 지역허브 {len(region_slugs)}개, 상세갱신 {written_posts}/{len(destinations)}건, 분할 sitemap.xml, rss.xml, llms.txt 생성 완료!")
 
 
 if __name__ == "__main__":
