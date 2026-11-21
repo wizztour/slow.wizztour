@@ -44,17 +44,13 @@
     .top-nav { background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
     .top-nav a { color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }
     .container { max-width:1040px; margin:0 auto; padding:26px 18px 60px; }
-    .spot-row { cursor:pointer; transition:background 0.18s ease; }
+    .spot-row { cursor:pointer; transition:background 0.15s ease; }
     .spot-row:hover { background:#f0fdfa !important; }
     .spot-link { display:flex; justify-content:space-between; align-items:center; gap:10px; color:#0f172a; font-weight:700; text-decoration:none; }
-    .spot-title { position:relative; display:inline-block; color:#0f172a; font-weight:700; transition:color 0.18s ease, transform 0.18s ease; }
-    .spot-title::after { content:''; position:absolute; left:0; bottom:-2px; width:100%; height:2px; background:#0f766e; border-radius:2px; transform:scaleX(0); transform-origin:left center; transition:transform 0.2s ease; }
-    .spot-row:hover .spot-title { color:#0f766e; transform:translateX(2px); }
-    .spot-row:hover .spot-title::after { transform:scaleX(1); }
-    .spot-cta { display:inline-flex; align-items:center; gap:4px; background:linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%); color:#0f766e; border:1px solid #99f6e4; font-size:12px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; box-shadow:0 1px 2px rgba(15, 118, 110, 0.08); transition:all 0.18s ease; }
-    .spot-arrow { display:inline-block; font-size:13px; line-height:1; transition:transform 0.18s ease; }
-    .spot-row:hover .spot-cta { background:linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color:#ffffff; border-color:#0f766e; box-shadow:0 3px 10px rgba(15, 118, 110, 0.25); transform:translateY(-1px); }
-    .spot-row:hover .spot-arrow { transform:translateX(3px); }
+    .spot-title { color:#0f172a; font-weight:700; transition:color 0.15s ease; }
+    .spot-row:hover .spot-title { color:#0f766e; }
+    .spot-cta { display:inline-flex; align-items:center; background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4; font-size:12px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+    .spot-row:hover .spot-cta { background:#0f766e; color:#ffffff; border-color:#0f766e; }
   </style>
 </head>
 <body>
@@ -107,7 +103,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/gyeongju-bomun-lake-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 보문관광단지 &amp; 보문호반길</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -120,7 +116,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-130666-barrier-free.html" class="spot-link">
               <span class="spot-title">청량산박물관</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -133,7 +129,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126230-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 보문관광단지</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -146,7 +142,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126166-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 불국사 [유네스코 세계유산]</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -159,7 +155,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-590997-barrier-free.html" class="spot-link">
               <span class="spot-title">경주월드 캘리포니아비치</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -172,7 +168,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2660941-barrier-free.html" class="spot-link">
               <span class="spot-title">국립김천치유의숲</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -185,7 +181,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-741053-barrier-free.html" class="spot-link">
               <span class="spot-title">국립대야산자연휴양림</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -198,7 +194,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2996749-barrier-free.html" class="spot-link">
               <span class="spot-title">송금체험마을영농조합법인</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -211,7 +207,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-894027-barrier-free.html" class="spot-link">
               <span class="spot-title">안동 하회마을 [유네스코 세계유산]</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -224,7 +220,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126203-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 김유신묘</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -237,7 +233,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-1492402-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 대릉원 일원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -250,7 +246,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126208-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 포석정지</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -263,7 +259,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126114-barrier-free.html" class="spot-link">
               <span class="spot-title">덕구온천 스파월드</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -276,7 +272,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126017-barrier-free.html" class="spot-link">
               <span class="spot-title">문경새재도립공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -289,7 +285,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3367497-barrier-free.html" class="spot-link">
               <span class="spot-title">미추왕릉</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -302,7 +298,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3404355-barrier-free.html" class="spot-link">
               <span class="spot-title">보현산댐 출렁다리</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -315,7 +311,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126201-barrier-free.html" class="spot-link">
               <span class="spot-title">영주 소수서원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -328,7 +324,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3444721-barrier-free.html" class="spot-link">
               <span class="spot-title">정글미디어파크</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -341,7 +337,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-578954-barrier-free.html" class="spot-link">
               <span class="spot-title">직지문화공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -354,7 +350,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3444315-barrier-free.html" class="spot-link">
               <span class="spot-title">청도소싸움미디어체험관</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -367,7 +363,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2616061-barrier-free.html" class="spot-link">
               <span class="spot-title">해파랑공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -380,7 +376,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3453929-barrier-free.html" class="spot-link">
               <span class="spot-title">경상북도교육청 발명체험교육관</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -393,7 +389,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-128116-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 계림</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -406,7 +402,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2736727-barrier-free.html" class="spot-link">
               <span class="spot-title">구미과학관</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -419,7 +415,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126102-barrier-free.html" class="spot-link">
               <span class="spot-title">구산해수욕장</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -432,7 +428,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126200-barrier-free.html" class="spot-link">
               <span class="spot-title">도산서원 [유네스코 세계유산]</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -445,7 +441,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-894087-barrier-free.html" class="spot-link">
               <span class="spot-title">무섬마을</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -458,7 +454,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2609519-barrier-free.html" class="spot-link">
               <span class="spot-title">소백산하늘자락공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -471,7 +467,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-129161-barrier-free.html" class="spot-link">
               <span class="spot-title">오류고아라해변</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -484,7 +480,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3447823-barrier-free.html" class="spot-link">
               <span class="spot-title">우륵공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -497,7 +493,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-988449-barrier-free.html" class="spot-link">
               <span class="spot-title">월영교</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -510,7 +506,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2760939-barrier-free.html" class="spot-link">
               <span class="spot-title">황룡사역사문화관</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -523,7 +519,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2770693-barrier-free.html" class="spot-link">
               <span class="spot-title">힐링로드(청하체리힐, 드로잉체리공방/누나서프/HJ디저트)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -536,7 +532,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3452165-barrier-free.html" class="spot-link">
               <span class="spot-title">경산청년지식놀이터</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -549,7 +545,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126210-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 무열왕릉·태종무열왕릉비</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -562,7 +558,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2603500-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 양남 주상절리 전망대</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -575,7 +571,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126207-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 첨성대</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -588,7 +584,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126103-barrier-free.html" class="spot-link">
               <span class="spot-title">고래불해수욕장</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -601,7 +597,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126016-barrier-free.html" class="spot-link">
               <span class="spot-title">금오산도립공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -614,7 +610,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-894158-barrier-free.html" class="spot-link">
               <span class="spot-title">예천 금당실마을</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -627,7 +623,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-407291-barrier-free.html" class="spot-link">
               <span class="spot-title">옥성자연휴양림</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -640,7 +636,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2603509-barrier-free.html" class="spot-link">
               <span class="spot-title">월정교</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -653,7 +649,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126020-barrier-free.html" class="spot-link">
               <span class="spot-title">주왕산국립공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -666,7 +662,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126155-barrier-free.html" class="spot-link">
               <span class="spot-title">직지사</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -679,7 +675,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-778402-barrier-free.html" class="spot-link">
               <span class="spot-title">태하향목관광모노레일</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -692,7 +688,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-704151-barrier-free.html" class="spot-link">
               <span class="spot-title">경상북도 산림환경연구원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -705,7 +701,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-319577-barrier-free.html" class="spot-link">
               <span class="spot-title">경주 독락당</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -718,7 +714,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-971032-barrier-free.html" class="spot-link">
               <span class="spot-title">경주역사유적지구 [유네스코 세계유산]</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -731,7 +727,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-1621854-barrier-free.html" class="spot-link">
               <span class="spot-title">관성솔밭해변</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -744,7 +740,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-125410-barrier-free.html" class="spot-link">
               <span class="spot-title">국립청옥산자연휴양림</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -757,7 +753,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126125-barrier-free.html" class="spot-link">
               <span class="spot-title">낙동강 경천대(경천대 전망대)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -770,7 +766,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126067-barrier-free.html" class="spot-link">
               <span class="spot-title">내연산 보경사 12폭포</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -783,7 +779,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126104-barrier-free.html" class="spot-link">
               <span class="spot-title">대진해수욕장</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -796,7 +792,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126134-barrier-free.html" class="spot-link">
               <span class="spot-title">보문호</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -809,7 +805,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126095-barrier-free.html" class="spot-link">
               <span class="spot-title">봉길대왕암해변</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -822,7 +818,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2790490-barrier-free.html" class="spot-link">
               <span class="spot-title">비손농장(포항체험잇다)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -835,7 +831,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2599775-barrier-free.html" class="spot-link">
               <span class="spot-title">상주 허씨비단직물</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -848,7 +844,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126113-barrier-free.html" class="spot-link">
               <span class="spot-title">성류굴 (경북 동해안 국가지질공원)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -861,7 +857,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2733119-barrier-free.html" class="spot-link">
               <span class="spot-title">세종대왕자태실 생명문화공원(태실문화관)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -874,7 +870,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126093-barrier-free.html" class="spot-link">
               <span class="spot-title">송도해변(포항)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -887,7 +883,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-705612-barrier-free.html" class="spot-link">
               <span class="spot-title">예천 삼강주막</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -900,7 +896,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-346655-barrier-free.html" class="spot-link">
               <span class="spot-title">용흥사(상주)</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -913,7 +909,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126090-barrier-free.html" class="spot-link">
               <span class="spot-title">월포해수욕장</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -926,7 +922,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-791432-barrier-free.html" class="spot-link">
               <span class="spot-title">의성 산운생태공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -939,7 +935,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126097-barrier-free.html" class="spot-link">
               <span class="spot-title">장사해수욕장</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -952,7 +948,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-128680-barrier-free.html" class="spot-link">
               <span class="spot-title">전촌솔밭해변</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
@@ -965,7 +961,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-3452841-barrier-free.html" class="spot-link">
               <span class="spot-title">조령제1관문</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -978,7 +974,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-126021-barrier-free.html" class="spot-link">
               <span class="spot-title">청량산도립공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -991,7 +987,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-127619-barrier-free.html" class="spot-link">
               <span class="spot-title">황성공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#15803d;">O</td>
@@ -1004,7 +1000,7 @@
           <td style="padding:10px 12px; border:1px solid #e2e8f0;">
             <a href="https://slow.wizztour.com/posts/spot-2756706-barrier-free.html" class="spot-link">
               <span class="spot-title">흥무공원</span>
-              <span class="spot-cta">상세보기 <span class="spot-arrow">→</span></span>
+              <span class="spot-cta">상세보기 →</span>
             </a>
           </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:#94a3b8;">-</td>
