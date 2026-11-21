@@ -1746,10 +1746,10 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
     .top-nav a {{ color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }}
     .container {{ max-width:1040px; margin:0 auto; padding:26px 18px 60px; }}
     .spot-row {{ cursor:pointer; transition:background 0.15s ease; }}
-    .spot-row:hover {{ background:#ecfdf5 !important; }}
-    .spot-link {{ display:flex; justify-content:space-between; align-items:center; gap:8px; color:#1d4ed8; font-weight:800; text-decoration:underline; text-underline-offset:3px; }}
-    .spot-link:hover {{ color:#0f766e; }}
-    .spot-cta {{ background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11.5px; font-weight:800; padding:3px 9px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; }}
+    .spot-row:hover {{ background:#f0fdfa !important; }}
+    .spot-link {{ display:flex; justify-content:space-between; align-items:center; gap:8px; color:#0f172a; font-weight:800; text-decoration:none; }}
+    .spot-row:hover .spot-link {{ color:#0f766e; }}
+    .spot-cta {{ background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:6px; white-space:nowrap; text-decoration:none; flex-shrink:0; transition:all 0.15s ease; }}
     .spot-row:hover .spot-cta {{ background:#0f766e; color:#ffffff; border-color:#0f766e; }}
   </style>
 </head>
