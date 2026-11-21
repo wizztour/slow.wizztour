@@ -1696,11 +1696,22 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
         w_ok = "O" if _bf_ok(bf, "wheelchair") else "-"
         t_ok = "O" if _bf_ok(bf, "restroom") else "-"
         s_ok = "O" if (_bf_ok(bf, "stroller") or _bf_ok(bf, "lactationroom")) else "-"
+        city_lbl = str(d.get("city") or "").strip()
+        if len(city_lbl) <= 1 and d.get("addr"):
+            ap = str(d["addr"]).split()
+            if len(ap) > 1:
+                city_lbl = re.sub(r"(시|군|구)$", "", ap[1]) or ap[1]
         bg = "#ffffff" if i % 2 == 0 else "#f8fafc"
+        post_url = f"{SITE_BASE_URL}/posts/{escape(d['slug'])}.html"
         rows += f"""
-        <tr style="background:{bg};">
-          <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">{escape(d.get('city',''))}</td>
-          <td style="padding:10px 12px; border:1px solid #e2e8f0;"><a href="{SITE_BASE_URL}/posts/{escape(d['slug'])}.html" style="color:#0f172a; font-weight:800; text-decoration:none;">{escape(d['title'])}</a></td>
+        <tr class="spot-row" style="background:{bg};" onclick="window.location.href='{post_url}';">
+          <td style="padding:10px 12px; border:1px solid #e2e8f0; font-weight:700; color:#0f766e; white-space:nowrap;">{escape(city_lbl)}</td>
+          <td style="padding:10px 12px; border:1px solid #e2e8f0;">
+            <a href="{post_url}" class="spot-link">
+              <span>{escape(d['title'])}</span>
+              <span class="spot-cta">상세 보기 →</span>
+            </a>
+          </td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if p_ok=='O' else '#94a3b8'};">{p_ok}</td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if r_ok=='O' else '#94a3b8'};">{r_ok}</td>
           <td style="padding:10px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:800; color:{'#15803d' if w_ok=='O' else '#94a3b8'};">{w_ok}</td>
@@ -1734,6 +1745,12 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
     .top-nav {{ background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }}
     .top-nav a {{ color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }}
     .container {{ max-width:1040px; margin:0 auto; padding:26px 18px 60px; }}
+    .spot-row {{ cursor:pointer; transition:background 0.15s ease; }}
+    .spot-row:hover {{ background:#ecfdf5 !important; }}
+    .spot-link {{ display:flex; justify-content:space-between; align-items:center; gap:8px; color:#1d4ed8; font-weight:800; text-decoration:underline; text-underline-offset:3px; }}
+    .spot-link:hover {{ color:#0f766e; }}
+    .spot-cta {{ background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11.5px; font-weight:800; padding:3px 9px; border-radius:999px; white-space:nowrap; text-decoration:none; flex-shrink:0; }}
+    .spot-row:hover .spot-cta {{ background:#0f766e; color:#ffffff; border-color:#0f766e; }}
   </style>
 </head>
 <body>
