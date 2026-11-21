@@ -119,6 +119,31 @@ def get_province_slug(prov: str) -> str:
     return PROVINCE_SLUG_MAP.get(prov, "etc")
 
 
+def make_common_responsive_css() -> str:
+    """PC·모바일(360px~430px) 전 화면 폭에서 깨짐·넘침·iOS 입력 자동확대를 방지하는 공통 반응형 CSS."""
+    return """
+    *, *::before, *::after { box-sizing:border-box; }
+    img { max-width:100%; height:auto; }
+    .top-nav-links { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; }
+    .mobile-scroll-hint { display:none; font-size:12px; color:#0f766e; font-weight:700; margin:0 0 6px 0; }
+    @media (max-width: 640px) {
+      .top-nav { padding:12px 14px !important; gap:8px !important; }
+      .top-nav-links { width:100%; font-size:13px; gap:8px 12px !important; }
+      .container { padding:16px 12px 44px !important; }
+      .card { padding:18px 14px !important; border-radius:14px !important; }
+      .hero { padding:26px 14px 24px !important; }
+      .hero h1 { font-size:22px !important; line-height:1.35 !important; }
+      .hero p { font-size:13.8px !important; margin-bottom:16px !important; }
+      .filter-btn { padding:7px 12px !important; font-size:12.5px !important; }
+      #gridHeading { font-size:18px !important; }
+      h1 { font-size:21px !important; line-height:1.38 !important; }
+      h2 { font-size:17.5px !important; line-height:1.4 !important; }
+      h3 { font-size:16.5px !important; line-height:1.45 !important; }
+      .mobile-scroll-hint { display:block; }
+    }
+""".strip("\n")
+
+
 def make_coupang_affsrp_url(keyword: str) -> str:
     """Zero-API 쿠팡 파트너스 공식 검색 랜딩 딥링크(AFFSRP)를 생성합니다. (subid 미합의 시 생략 원칙 준수)"""
     return f"https://link.coupang.com/re/AFFSRP?lptag={COUPANG_AF_ID}&pageKey={quote(keyword)}"
@@ -703,11 +728,11 @@ def make_slow_flat_route_html(title: str, city: str, flat_route: list) -> str:
     rows = ""
     for idx, step in enumerate(flat_route, start=1):
         rows += f"""
-        <div style="display:flex; gap:14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
           <div style="background:#0f766e; color:#ffffff; font-weight:800; font-size:12.5px; padding:6px 10px; border-radius:8px; white-space:nowrap;">
             STEP {idx} · {escape(step.get('time', ''))}
           </div>
-          <div>
+          <div style="flex:1 1 210px; min-width:210px;">
             <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:4px;">{escape(step.get('place', ''))}</div>
             <div style="font-size:13.5px; color:#475569; line-height:1.55;">💡 <strong>무장애 동선 포인트</strong>: {escape(step.get('note', ''))}</div>
           </div>
@@ -782,6 +807,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
     <strong>① 엘리베이터 및 출입구 무경사 여부, ② 장애인 전용 객실(욕실 안전바·넓은 문폭) 또는 침대형 패밀리룸, ③ 1층 조식당 동선 및 무료취소 조건</strong>입니다.
   </p>
 
+  <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 조건·예약 버튼을 확인하세요</p>
   <div style="overflow-x:auto; margin:14px 0;">
     <table style="width:100%; border-collapse:collapse; font-size:13.8px; text-align:left; min-width:540px;">
       <thead>
@@ -964,6 +990,7 @@ def make_quick_spec_table_html(dest: dict, bf: dict) -> str:
   <h2 style="margin:0 0 10px 0; font-size:18.5px; color:#0f172a; font-weight:800;">
     ⚡ 1초 무장애 시설 조회표: {escape(title)}
   </h2>
+  <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 항목을 확인하세요</p>
   <div style="overflow-x:auto;">
     <table style="width:100%; border-collapse:collapse; font-size:13.5px; min-width:480px;">
       <thead>
@@ -982,80 +1009,53 @@ def make_quick_spec_table_html(dest: dict, bf: dict) -> str:
 
 def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
     """
-    [CarCare식 결핍 해결형 쿠팡 파트너스 연동 박스]
-    명소의 무장애 팩트 데이터(휠체어 대여 유무·유모차/수유실·산책거리)에 1:1 직결되는 필수 준비물을 Zero-API AFFSRP 딥링크로 연결
+    [슬림형 결핍 해결형 쿠팡 파트너스 바]
+    스펙표 바로 아래 시야를 가리지 않도록 핵심 준비물 2종 링크와 대가성 문구만 간결하게 배치합니다.
     """
-    title = dest["title"]
-    city = dest.get("city", "")
     ctid = str(dest.get("contentTypeId") or "12")
     has_wheelchair_rental = _bf_ok(bf, "wheelchair")
     has_baby = _bf_ok(bf, "stroller") or _bf_ok(bf, "lactationroom") or _bf_ok(bf, "infantsfamilyetc")
 
     if ctid == "32":
-        reason_msg = f"🏨 <strong>{escape(title)}</strong> 숙박 시 객실 내 어르신 낙상 예방 및 편안한 숙면을 위해 미리 준비하면 좋은 케어 용품입니다."
         products = [
-            ("🛁 욕실 미끄럼방지 안전매트 · 휴대용 안전바", "어르신·아이 샤워실 미끄럼 사고 완벽 대비", "욕실 미끄럼방지 안전매트", "#0f766e", "인기 필수템"),
-            ("🛏️ 여행용 접이식 경추베개 · 휴대용 발마사지기", "장거리 이동 후 뭉친 부모님 목·종아리 피로 해소", "여행용 경추베개", "#2563eb", "효도 베스트"),
+            ("🛁 욕실 미끄럼방지 매트", "욕실 미끄럼방지 안전매트", "#0f766e"),
+            ("🛏️ 여행용 접이식 경추베개", "여행용 경추베개", "#2563eb"),
         ]
     elif has_baby and not has_wheelchair_rental:
-        reason_msg = f"👶 <strong>{escape(title)}</strong>은(는) 가족·유모차 동반 적합지이지만 현장 휠체어 대여 정보가 확인되지 않았습니다. 온 가족 동반 시 출발 전 꼭 점검해 보세요."
         products = [
-            ("👶 초경량 기내반입 접이식 휴대용 유모차", "평지 데크·전시관 이동에 최적화된 가벼운 핸들링", "초경량 기내반입 휴대용 유모차", "#2563eb", "가족 필수 1위"),
-            ("🦽 초경량 접이식 휴대용 알루미늄 휠체어", "트렁크 적재 간편 · 현장 대여 품절 걱정 끝", "초경량 접이식 휴대용 휠체어", "#0f766e", "현장대비 필수"),
+            ("👶 기내반입 휴대용 유모차", "초경량 기내반입 휴대용 유모차", "#2563eb"),
+            ("🦽 초경량 접이식 휠체어", "초경량 접이식 휴대용 휠체어", "#0f766e"),
         ]
     elif has_baby:
-        reason_msg = f"🍼 <strong>{escape(title)}</strong> 유모차·영유아 편의시설 확인 완료! 나들이 현장에서 가장 많이 찾는 유모차·외출 필수 준비물을 모았습니다."
         products = [
-            ("👶 초경량 기내반입 휴대용 유모차 · 방풍커버", "바람·햇빛 차단 및 편안한 평지 산책 주행", "유모차 방풍커버 햇빛가리개", "#2563eb", "유모차 인기"),
-            ("🍼 휴대용 젖병 보온 파우치 · 힙시트 아기띠", "수유실 이동 전후 간편한 외출 수유·휴대 수납", "휴대용 젖병 보온 파우치", "#ea580c", "부모 선호"),
+            ("👶 유모차 방풍·햇빛커버", "유모차 방풍커버 햇빛가리개", "#2563eb"),
+            ("🍼 휴대용 젖병 보온파우치", "휴대용 젖병 보온 파우치", "#ea580c"),
         ]
     else:
-        wc_note = "현장 대여 수량이 조기 소진될 수 있어" if has_wheelchair_rental else "공식 데이터상 현장 휠체어 대여 여부가 확인되지 않아"
-        reason_msg = f"🦽 <strong>{escape(title)}</strong> 방문 전 체크: {wc_note}, 어르신 보행 부담 및 대기 줄 피로를 덜어주는 휴대용 보조장비 준비를 권장합니다."
         products = [
-            ("🦽 초경량 접이식 휴대용 휠체어 (차량 적재형)", "무게 가볍고 한 번에 접혀 일반 승용차 트렁크 수납", "초경량 접이식 휴대용 휠체어", "#0f766e", "인기 1위"),
-            ("🪑 지팡이 겸용 초경량 접이식 휴대의자", "걷다가 무릎 아플 때 1초 만에 펼쳐 앉는 효도 필수템", "지팡이 접이식 의자", "#ea580c", "효도 베스트"),
+            ("🦽 초경량 접이식 휠체어", "초경량 접이식 휴대용 휠체어", "#0f766e"),
+            ("🪑 지팡이 접이식 휴대의자", "지팡이 접이식 의자", "#ea580c"),
         ]
 
-    cards_html = ""
-    for p_title, p_desc, kw, color, badge in products:
+    btns_html = ""
+    for label, kw, color in products:
         c_url = make_coupang_affsrp_url(kw)
-        cards_html += f"""
-        <div style="background:#ffffff; border:1px solid #fed7aa; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-            <span style="background:#fff7ed; color:#c2410c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; border:1px solid #fdba74;">{escape(badge)}</span>
-            <span style="font-size:11.5px; color:#64748b;">로켓배송 추천</span>
-          </div>
-          <div style="font-size:15px; font-weight:800; color:#0f172a; line-height:1.4;">{p_title}</div>
-          <div style="font-size:13px; color:#475569; line-height:1.5;">{p_desc}</div>
-          <a href="{escape(c_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
-             style="margin-top:auto; display:block; text-align:center; background:{color}; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:10px 14px; border-radius:8px; text-decoration:none;">
-            🚀 쿠팡에서 '{escape(kw)}' 최저가 확인 →
-          </a>
-        </div>
-        """.strip()
+        btns_html += (
+            f'<a href="{escape(c_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
+            f'style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;">'
+            f'<span>{label}</span>'
+            f'<span style="background:{color}; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span>'
+            f'</a>'
+        )
 
-    default_kw = quote(f"{city} 여행 부모님 효도 선물 무릎보호대" if not has_baby else "유모차 쿨시트 휴대용 선풍기")
     return f"""
-<section id="coupang-care-gear" style="margin:24px 0; padding:18px 18px 20px; background:linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%); border:2px solid #f97316; border-radius:16px;">
-  <div style="background:#ffffff; border-left:4px solid #f97316; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px; font-weight:700; color:#0f172a; line-height:1.5;">
-    📢 이 포스팅은 <span style="color:#ea580c; font-weight:800;">쿠팡 파트너스</span> 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+<section id="coupang-care-gear" style="margin:16px 0 20px 0; padding:12px 14px; background:#fff7ed; border:1px solid #fdba74; border-radius:12px;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 10px; margin-bottom:10px;">
+    <span style="font-size:13.5px; font-weight:800; color:#9a3412;">🛒 출발 전 챙기면 좋은 무장애·가족 준비물</span>
+    <span style="font-size:11.5px; color:#9a3412;">※ 쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</span>
   </div>
-  <h3 style="margin:0 0 8px 0; font-size:18px; color:#9a3412; font-weight:800;">
-    🛒 {escape(title)} 맞춤 무장애·효도·유모차 필수 준비물 (출발 전 로켓배송)
-  </h3>
-  <p style="margin:0 0 14px 0; font-size:13.8px; color:#431407; line-height:1.6;">{reason_msg}</p>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
-    {cards_html}
-  </div>
-  <div style="margin-top:14px; padding-top:12px; border-top:1px dashed #fdba74; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-    <input type="text" id="cpSearchInput" placeholder="필요한 준비물 검색 (예: 보행보조차, 무릎보호대, 방풍커버)"
-           style="flex:1 1 220px; padding:9px 12px; border:1px solid #fdba74; border-radius:8px; font-size:13.5px;">
-    <button type="button"
-            onclick="var q=document.getElementById('cpSearchInput').value.trim()||'접이식 휠체어'; window.open('https://link.coupang.com/re/AFFSRP?lptag={COUPANG_AF_ID}&pageKey='+encodeURIComponent(q), '_blank', 'noopener,noreferrer');"
-            style="background:#ea580c; color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:800; font-size:13.5px; cursor:pointer;">
-      🔍 쿠팡 최저가 바로 검색
-    </button>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
+    {btns_html}
   </div>
 </section>
 """.strip()
@@ -1246,6 +1246,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
   <script type="application/ld+json">{json.dumps(json_ld, ensure_ascii=False)}</script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+{make_common_responsive_css()}
     body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; line-height:1.7; }}
     .container {{ max-width:860px; margin:0 auto; padding:24px 18px 60px; }}
     .top-nav {{ background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }}
@@ -1261,7 +1262,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
       <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%; display:block;">
       <span>WizzTour Slow <span style="font-size:12.5px; color:#99f6e4; font-weight:500;">| 무장애·효도·유모차 평지 여행 가이드</span></span>
     </a>
-    <div style="display:flex; gap:14px;">
+    <div class="top-nav-links">
       <a href="{SITE_BASE_URL}/index.html">전체 무장애 코스</a>
       <a href="https://www.wizztour.com" target="_blank" rel="noopener">전국 축제 메인</a>
       <a href="https://info.wizztour.com" target="_blank" rel="noopener">캠핑·낚시 지도</a>
@@ -1429,6 +1430,7 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
   <meta property="og:image" content="{SITE_BASE_URL}/assets/og-image.jpg">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+{make_common_responsive_css()}
     body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; line-height:1.65; }}
     .top-nav {{ background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }}
     .top-nav a {{ color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }}
@@ -1441,7 +1443,7 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
       <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%;">
       <span>WizzTour Slow</span>
     </a>
-    <div style="display:flex; gap:14px;">
+    <div class="top-nav-links">
       <a href="{SITE_BASE_URL}/">전국 전체 보기</a>
       <a href="https://www.wizztour.com" target="_blank" rel="noopener">축제 메인</a>
     </div>
@@ -1457,6 +1459,7 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
         <a href="{escape(coupang_chair)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#ea580c; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">지팡이 휴대의자 보기</a>
       </div>
     </div>
+    <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 무장애 항목을 확인하세요</p>
     <div style="overflow-x:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px;">
       <table style="width:100%; border-collapse:collapse; font-size:13.8px; min-width:560px;">
         <thead>
@@ -1558,17 +1561,18 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
   <meta name="twitter:image" content="{idx_og_img}">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+{make_common_responsive_css()}
     body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; }}
     .hero {{ background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:40px 20px 36px; text-align:center; }}
     .hero h1 {{ margin:10px 0 12px; font-size:29px; font-weight:800; line-height:1.35; }}
     .hero p {{ max-width:700px; margin:0 auto 20px; color:#ccfbf1; font-size:15px; line-height:1.65; }}
     .search-box {{ max-width:620px; margin:0 auto 18px; display:flex; gap:8px; }}
-    .search-box input {{ flex:1; padding:12px 16px; border-radius:999px; border:2px solid #5eead4; font-size:14.5px; outline:none; }}
+    .search-box input {{ flex:1; min-width:0; padding:12px 16px; border-radius:999px; border:2px solid #5eead4; font-size:16px; outline:none; }}
     .filter-bar {{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:780px; margin:0 auto; }}
     .filter-btn {{ background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:700; transition:0.2s; }}
     .filter-btn.active, .filter-btn:hover {{ background:#14b8a6; border-color:#14b8a6; color:#0f172a; }}
     .container {{ max-width:1100px; margin:0 auto; padding:26px 18px 60px; }}
-    .grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(310px, 1fr)); gap:20px; }}
+    .grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:20px; }}
     .spot-card {{ background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(15,23,42,0.05); transition:transform 0.2s; }}
     .spot-card:hover {{ transform:translateY(-4px); }}
   </style>

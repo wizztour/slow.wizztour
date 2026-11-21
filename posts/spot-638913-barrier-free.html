@@ -26,6 +26,25 @@
   <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TouristAttraction", "name": "수원박물관", "description": "✅ 1초 확인 (2026년 11월 21일 기준): 경기 수원 수원박물관의 주차장O·경사로O·휠체어대여O·화장실O 상세 위치, KTO 혼잡도 골든타임, 계단 없는 평지 산책 코스 및 엘리베이터·장애인객실 호텔 비교 가이드.", "image": "https://tong.visitkorea.or.kr/cms/resource/81/4056581_image2_1.jpg", "address": {"@type": "PostalAddress", "streetAddress": "경기도 수원시 영통구 창룡대로 265 (이의동)", "addressLocality": "수원", "addressRegion": "경기", "addressCountry": "KR"}, "isAccessibleForFree": true, "publicAccess": true, "touristType": ["Wheelchair Users", "Senior Citizens", "Families with Strollers"], "isPartOf": {"@id": "https://www.wizztour.com/#organization"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "수원박물관에 장애인 전용 주차장과 무장애 경사로가 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "주차장: 장애인 전용 주차구역 있음 (3개)_무장애 편의시설 / 접근로: 출입구까지 단차가 없어 휠체어 접근 가능함"}}, {"@type": "Question", "name": "수원박물관에서 휠체어나 유모차 대여가 가능한가요?", "acceptedAnswer": {"@type": "Answer", "text": "무료대여 가능(2대)"}}, {"@type": "Question", "name": "수원박물관 내 장애인 전용 화장실 정보는 어떻게 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "장애인 전용 화장실 있음 (1층)"}}]}, {"@type": "Organization", "@id": "https://www.wizztour.com/#organization", "name": "WizzTour (위즈투어 대한민국 4대 여행 생태계)", "url": "https://www.wizztour.com", "logo": "https://slow.wizztour.com/assets/brand-circle.png", "sameAs": ["https://www.wizztour.com", "https://info.wizztour.com", "https://en.wizztour.com", "https://slow.wizztour.com", "https://www.threads.net/@visit_wizztour"], "subOrganization": [{"@type": "WebSite", "name": "WizzTour 전국 축제·당일치기 메인 가이드", "url": "https://www.wizztour.com"}, {"@type": "WebSite", "name": "WizzTour Info 전국 캠핑·글램핑·민물낚시 지도", "url": "https://info.wizztour.com"}, {"@type": "WebSite", "name": "WizzTour Global 영문 한국 여행 가이드", "url": "https://en.wizztour.com"}, {"@type": "WebSite", "name": "WizzTour Slow 무장애·부모님 효도·유모차 평지 여행", "url": "https://slow.wizztour.com"}]}]}</script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    img { max-width:100%; height:auto; }
+    .top-nav-links { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; }
+    .mobile-scroll-hint { display:none; font-size:12px; color:#0f766e; font-weight:700; margin:0 0 6px 0; }
+    @media (max-width: 640px) {
+      .top-nav { padding:12px 14px !important; gap:8px !important; }
+      .top-nav-links { width:100%; font-size:13px; gap:8px 12px !important; }
+      .container { padding:16px 12px 44px !important; }
+      .card { padding:18px 14px !important; border-radius:14px !important; }
+      .hero { padding:26px 14px 24px !important; }
+      .hero h1 { font-size:22px !important; line-height:1.35 !important; }
+      .hero p { font-size:13.8px !important; margin-bottom:16px !important; }
+      .filter-btn { padding:7px 12px !important; font-size:12.5px !important; }
+      #gridHeading { font-size:18px !important; }
+      h1 { font-size:21px !important; line-height:1.38 !important; }
+      h2 { font-size:17.5px !important; line-height:1.4 !important; }
+      h3 { font-size:16.5px !important; line-height:1.45 !important; }
+      .mobile-scroll-hint { display:block; }
+    }
     body { margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; line-height:1.7; }
     .container { max-width:860px; margin:0 auto; padding:24px 18px 60px; }
     .top-nav { background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
@@ -41,7 +60,7 @@
       <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%; display:block;">
       <span>WizzTour Slow <span style="font-size:12.5px; color:#99f6e4; font-weight:500;">| 무장애·효도·유모차 평지 여행 가이드</span></span>
     </a>
-    <div style="display:flex; gap:14px;">
+    <div class="top-nav-links">
       <a href="https://slow.wizztour.com/index.html">전체 무장애 코스</a>
       <a href="https://www.wizztour.com" target="_blank" rel="noopener">전국 축제 메인</a>
       <a href="https://info.wizztour.com" target="_blank" rel="noopener">캠핑·낚시 지도</a>
@@ -80,6 +99,7 @@
   <h2 style="margin:0 0 10px 0; font-size:18.5px; color:#0f172a; font-weight:800;">
     ⚡ 1초 무장애 시설 조회표: 수원박물관
   </h2>
+  <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 항목을 확인하세요</p>
   <div style="overflow-x:auto;">
     <table style="width:100%; border-collapse:collapse; font-size:13.5px; min-width:480px;">
       <thead>
@@ -95,47 +115,13 @@
 </section>
 
       <!-- 명소 결핍 해결형 쿠팡 파트너스 맞춤 준비물 추천 -->
-      <section id="coupang-care-gear" style="margin:24px 0; padding:18px 18px 20px; background:linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%); border:2px solid #f97316; border-radius:16px;">
-  <div style="background:#ffffff; border-left:4px solid #f97316; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px; font-weight:700; color:#0f172a; line-height:1.5;">
-    📢 이 포스팅은 <span style="color:#ea580c; font-weight:800;">쿠팡 파트너스</span> 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+      <section id="coupang-care-gear" style="margin:16px 0 20px 0; padding:12px 14px; background:#fff7ed; border:1px solid #fdba74; border-radius:12px;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 10px; margin-bottom:10px;">
+    <span style="font-size:13.5px; font-weight:800; color:#9a3412;">🛒 출발 전 챙기면 좋은 무장애·가족 준비물</span>
+    <span style="font-size:11.5px; color:#9a3412;">※ 쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</span>
   </div>
-  <h3 style="margin:0 0 8px 0; font-size:18px; color:#9a3412; font-weight:800;">
-    🛒 수원박물관 맞춤 무장애·효도·유모차 필수 준비물 (출발 전 로켓배송)
-  </h3>
-  <p style="margin:0 0 14px 0; font-size:13.8px; color:#431407; line-height:1.6;">🍼 <strong>수원박물관</strong> 유모차·영유아 편의시설 확인 완료! 나들이 현장에서 가장 많이 찾는 유모차·외출 필수 준비물을 모았습니다.</p>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
-    <div style="background:#ffffff; border:1px solid #fed7aa; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-            <span style="background:#fff7ed; color:#c2410c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; border:1px solid #fdba74;">유모차 인기</span>
-            <span style="font-size:11.5px; color:#64748b;">로켓배송 추천</span>
-          </div>
-          <div style="font-size:15px; font-weight:800; color:#0f172a; line-height:1.4;">👶 초경량 기내반입 휴대용 유모차 · 방풍커버</div>
-          <div style="font-size:13px; color:#475569; line-height:1.5;">바람·햇빛 차단 및 편안한 평지 산책 주행</div>
-          <a href="https://link.coupang.com/re/AFFSRP?lptag=AF2307983&amp;pageKey=%EC%9C%A0%EB%AA%A8%EC%B0%A8%20%EB%B0%A9%ED%92%8D%EC%BB%A4%EB%B2%84%20%ED%96%87%EB%B9%9B%EA%B0%80%EB%A6%AC%EA%B0%9C" target="_blank" rel="nofollow sponsored noopener noreferrer"
-             style="margin-top:auto; display:block; text-align:center; background:#2563eb; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:10px 14px; border-radius:8px; text-decoration:none;">
-            🚀 쿠팡에서 '유모차 방풍커버 햇빛가리개' 최저가 확인 →
-          </a>
-        </div><div style="background:#ffffff; border:1px solid #fed7aa; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-            <span style="background:#fff7ed; color:#c2410c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; border:1px solid #fdba74;">부모 선호</span>
-            <span style="font-size:11.5px; color:#64748b;">로켓배송 추천</span>
-          </div>
-          <div style="font-size:15px; font-weight:800; color:#0f172a; line-height:1.4;">🍼 휴대용 젖병 보온 파우치 · 힙시트 아기띠</div>
-          <div style="font-size:13px; color:#475569; line-height:1.5;">수유실 이동 전후 간편한 외출 수유·휴대 수납</div>
-          <a href="https://link.coupang.com/re/AFFSRP?lptag=AF2307983&amp;pageKey=%ED%9C%B4%EB%8C%80%EC%9A%A9%20%EC%A0%96%EB%B3%91%20%EB%B3%B4%EC%98%A8%20%ED%8C%8C%EC%9A%B0%EC%B9%98" target="_blank" rel="nofollow sponsored noopener noreferrer"
-             style="margin-top:auto; display:block; text-align:center; background:#ea580c; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:10px 14px; border-radius:8px; text-decoration:none;">
-            🚀 쿠팡에서 '휴대용 젖병 보온 파우치' 최저가 확인 →
-          </a>
-        </div>
-  </div>
-  <div style="margin-top:14px; padding-top:12px; border-top:1px dashed #fdba74; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-    <input type="text" id="cpSearchInput" placeholder="필요한 준비물 검색 (예: 보행보조차, 무릎보호대, 방풍커버)"
-           style="flex:1 1 220px; padding:9px 12px; border:1px solid #fdba74; border-radius:8px; font-size:13.5px;">
-    <button type="button"
-            onclick="var q=document.getElementById('cpSearchInput').value.trim()||'접이식 휠체어'; window.open('https://link.coupang.com/re/AFFSRP?lptag=AF2307983&pageKey='+encodeURIComponent(q), '_blank', 'noopener,noreferrer');"
-            style="background:#ea580c; color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:800; font-size:13.5px; cursor:pointer;">
-      🔍 쿠팡 최저가 바로 검색
-    </button>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
+    <a href="https://link.coupang.com/re/AFFSRP?lptag=AF2307983&amp;pageKey=%EC%9C%A0%EB%AA%A8%EC%B0%A8%20%EB%B0%A9%ED%92%8D%EC%BB%A4%EB%B2%84%20%ED%96%87%EB%B9%9B%EA%B0%80%EB%A6%AC%EA%B0%9C" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;"><span>👶 유모차 방풍·햇빛커버</span><span style="background:#2563eb; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span></a><a href="https://link.coupang.com/re/AFFSRP?lptag=AF2307983&amp;pageKey=%ED%9C%B4%EB%8C%80%EC%9A%A9%20%EC%A0%96%EB%B3%91%20%EB%B3%B4%EC%98%A8%20%ED%8C%8C%EC%9A%B0%EC%B9%98" target="_blank" rel="nofollow sponsored noopener noreferrer" style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;"><span>🍼 휴대용 젖병 보온파우치</span><span style="background:#ea580c; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span></a>
   </div>
 </section>
 
@@ -315,35 +301,35 @@
     무리하게 많은 곳을 찍는 대신, <strong>장애인 주차장 하차 → 평지 데크 산책 → 1층 입식 맛집 → 통창 엘리베이터 카페 → 무장애 호텔 휴식</strong>으로 피로도를 최소화한 동선입니다.
   </p>
   <div style="display:flex; flex-direction:column; gap:10px;">
-    <div style="display:flex; gap:14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
+    <div style="display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
           <div style="background:#0f766e; color:#ffffff; font-weight:800; font-size:12.5px; padding:6px 10px; border-radius:8px; white-space:nowrap;">
             STEP 1 · 오전 10:30
           </div>
-          <div>
+          <div style="flex:1 1 210px; min-width:210px;">
             <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:4px;">수원박물관 장애인주차장 하차 → 무장애 주 관람 동선</div>
             <div style="font-size:13.5px; color:#475569; line-height:1.55;">💡 <strong>무장애 동선 포인트</strong>: 주출입구 경사로 및 평지 위주 산책</div>
           </div>
-        </div><div style="display:flex; gap:14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
+        </div><div style="display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
           <div style="background:#0f766e; color:#ffffff; font-weight:800; font-size:12.5px; padding:6px 10px; border-radius:8px; white-space:nowrap;">
             STEP 2 · 점심 12:30
           </div>
-          <div>
+          <div style="flex:1 1 210px; min-width:210px;">
             <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:4px;">수원 인근 1층 평지 입식 식당</div>
             <div style="font-size:13.5px; color:#475569; line-height:1.55;">💡 <strong>무장애 동선 포인트</strong>: 문턱 없는 1층 테이블 좌석 식당 추천</div>
           </div>
-        </div><div style="display:flex; gap:14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
+        </div><div style="display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
           <div style="background:#0f766e; color:#ffffff; font-weight:800; font-size:12.5px; padding:6px 10px; border-radius:8px; white-space:nowrap;">
             STEP 3 · 오후 14:30
           </div>
-          <div>
+          <div style="flex:1 1 210px; min-width:210px;">
             <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:4px;">수원 엘리베이터·장애인화장실 완비 휴식 카페</div>
             <div style="font-size:13.5px; color:#475569; line-height:1.55;">💡 <strong>무장애 동선 포인트</strong>: 주차 편리하고 좌석 간격 넓은 대형 카페</div>
           </div>
-        </div><div style="display:flex; gap:14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
+        </div><div style="display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-start; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px;">
           <div style="background:#0f766e; color:#ffffff; font-weight:800; font-size:12.5px; padding:6px 10px; border-radius:8px; white-space:nowrap;">
             STEP 4 · 저녁 17:30
           </div>
-          <div>
+          <div style="flex:1 1 210px; min-width:210px;">
             <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:4px;">수원 엘리베이터·장애인객실 보유 호텔 체크인</div>
             <div style="font-size:13.5px; color:#475569; line-height:1.55;">💡 <strong>무장애 동선 포인트</strong>: 무리 없는 동선으로 편안한 휴식</div>
           </div>
@@ -378,6 +364,7 @@
     <strong>① 엘리베이터 및 출입구 무경사 여부, ② 장애인 전용 객실(욕실 안전바·넓은 문폭) 또는 침대형 패밀리룸, ③ 1층 조식당 동선 및 무료취소 조건</strong>입니다.
   </p>
 
+  <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 조건·예약 버튼을 확인하세요</p>
   <div style="overflow-x:auto; margin:14px 0;">
     <table style="width:100%; border-collapse:collapse; font-size:13.8px; text-align:left; min-width:540px;">
       <thead>

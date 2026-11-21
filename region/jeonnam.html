@@ -21,6 +21,25 @@
   <meta property="og:image" content="https://slow.wizztour.com/assets/og-image.jpg">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    img { max-width:100%; height:auto; }
+    .top-nav-links { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; }
+    .mobile-scroll-hint { display:none; font-size:12px; color:#0f766e; font-weight:700; margin:0 0 6px 0; }
+    @media (max-width: 640px) {
+      .top-nav { padding:12px 14px !important; gap:8px !important; }
+      .top-nav-links { width:100%; font-size:13px; gap:8px 12px !important; }
+      .container { padding:16px 12px 44px !important; }
+      .card { padding:18px 14px !important; border-radius:14px !important; }
+      .hero { padding:26px 14px 24px !important; }
+      .hero h1 { font-size:22px !important; line-height:1.35 !important; }
+      .hero p { font-size:13.8px !important; margin-bottom:16px !important; }
+      .filter-btn { padding:7px 12px !important; font-size:12.5px !important; }
+      #gridHeading { font-size:18px !important; }
+      h1 { font-size:21px !important; line-height:1.38 !important; }
+      h2 { font-size:17.5px !important; line-height:1.4 !important; }
+      h3 { font-size:16.5px !important; line-height:1.45 !important; }
+      .mobile-scroll-hint { display:block; }
+    }
     body { margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; line-height:1.65; }
     .top-nav { background:#0f172a; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
     .top-nav a { color:#5eead4; text-decoration:none; font-weight:700; font-size:14px; }
@@ -33,7 +52,7 @@
       <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%;">
       <span>WizzTour Slow</span>
     </a>
-    <div style="display:flex; gap:14px;">
+    <div class="top-nav-links">
       <a href="https://slow.wizztour.com/">전국 전체 보기</a>
       <a href="https://www.wizztour.com" target="_blank" rel="noopener">축제 메인</a>
     </div>
@@ -58,6 +77,7 @@
         <a href="https://link.coupang.com/re/AFFSRP?lptag=AF2307983&amp;pageKey=%EC%A7%80%ED%8C%A1%EC%9D%B4%20%EC%A0%91%EC%9D%B4%EC%8B%9D%20%EC%9D%98%EC%9E%90" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#ea580c; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">지팡이 휴대의자 보기</a>
       </div>
     </div>
+    <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 무장애 항목을 확인하세요</p>
     <div style="overflow-x:auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px;">
       <table style="width:100%; border-collapse:collapse; font-size:13.8px; min-width:560px;">
         <thead>
