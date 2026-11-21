@@ -34,6 +34,7 @@ import time
 import random
 import argparse
 from datetime import datetime, timezone, timedelta
+from email.utils import format_datetime
 from html import escape
 from urllib.parse import quote, unquote
 import requests
@@ -48,11 +49,46 @@ except ImportError:
 
 KST = timezone(timedelta(hours=9))
 SITE_BASE_URL = (os.environ.get("SITE_BASE_URL") or "https://slow.wizztour.com").rstrip("/")
+NAVER_SITE_VERIFICATION = "6e62ea7b0d3d8cc46edf28d0000a53c92aa3ce65"
+DAUM_WEBMASTER_PIN = "#DaumWebMasterTool:7a1b73690412093fe32403c85e8cf3659b7fe9c22c78020a59d12f65d6937bfd:9OXzxfMP1b1VGCOsL/bJCQ=="
+ADSENSE_CLIENT = "ca-pub-9640565499370684"
+AD_SLOT_TOP = "3911475090"     # slow 상단
+AD_SLOT_MID = "6591102613"     # slow 중간
+AD_SLOT_BOTTOM = "5109006694"  # slow 하단
 SERVICE_KEY = os.environ.get("TOUR_API_KEY") or os.environ.get("PUBLIC_DATA_API_KEY") or ""
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
 GPT_API_KEY = os.environ.get("OPENAI_API_KEY") or ""
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID") or "1JErLxLYPvVufyxjvi6hnfbbQL7lyy4XEGLMrKZZb0x4"
 TRIPCOM_SHEET_NAME = "트립닷컴"
+
+
+def make_common_head_meta() -> str:
+    """네이버/애드센스 인증 메타, 파비콘, RSS 링크, 애드센스 스크립트를 공통 생성합니다."""
+    return (
+        f'  <meta name="naver-site-verification" content="{NAVER_SITE_VERIFICATION}" />\n'
+        f'  <meta name="google-adsense-account" content="{ADSENSE_CLIENT}" />\n'
+        f'  <link rel="icon" href="/favicon.ico" sizes="any">\n'
+        f'  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">\n'
+        f'  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">\n'
+        f'  <link rel="alternate" type="application/rss+xml" title="WizzTour Slow RSS" href="{SITE_BASE_URL}/rss.xml">\n'
+        f'  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={ADSENSE_CLIENT}" crossorigin="anonymous"></script>'
+    )
+
+
+def make_adsense_unit_html(slot_id: str, label: str) -> str:
+    """반응형 Google AdSense 디스플레이 광고 블록을 생성합니다."""
+    return (
+        f'      <div class="sh-ad-slot" style="margin:22px 0; text-align:center; min-height:90px;">\n'
+        f'        <!-- {label} -->\n'
+        f'        <ins class="adsbygoogle"\n'
+        f'             style="display:block"\n'
+        f'             data-ad-client="{ADSENSE_CLIENT}"\n'
+        f'             data-ad-slot="{slot_id}"\n'
+        f'             data-ad-format="auto"\n'
+        f'             data-full-width-responsive="true"></ins>\n'
+        f'        <script>(adsbygoogle = window.adsbygoogle || []).push({{}});</script>\n'
+        f'      </div>'
+    )
 
 # 세시간전(3hoursahead, AID: 121912) 클룩(Klook) 티켓·렌트카·eSIM 공식 제휴 링크 5종 (30일 쿠키 트래킹)
 USIMSA_AFFILIATE_URL = os.environ.get("USIMSA_AFFILIATE_URL") or "https://3ha.in/r/874416"
@@ -882,6 +918,7 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
                 "@id": "https://www.wizztour.com/#organization",
                 "name": "WizzTour (위즈투어 대한민국 4대 여행 생태계)",
                 "url": "https://www.wizztour.com",
+                "logo": f"{SITE_BASE_URL}/assets/brand-circle.png",
                 "sameAs": [
                     "https://www.wizztour.com",
                     "https://info.wizztour.com",
@@ -899,6 +936,12 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
         ]
     }
 
+    common_head = make_common_head_meta()
+    ad_top_html = make_adsense_unit_html(AD_SLOT_TOP, "slow 상단")
+    ad_mid_html = make_adsense_unit_html(AD_SLOT_MID, "slow 중간")
+    ad_bottom_html = make_adsense_unit_html(AD_SLOT_BOTTOM, "slow 하단")
+    post_og_img = dest.get('image') or f"{SITE_BASE_URL}/assets/og-image.jpg"
+
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -906,12 +949,18 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{escape(seo_title)}</title>
   <meta name="description" content="{escape(meta_desc)}">
+{common_head}
   <link rel="canonical" href="{escape(canonical)}">
   <meta property="og:type" content="article">
+  <meta property="og:site_name" content="WizzTour Slow">
   <meta property="og:title" content="{escape(seo_title)}">
   <meta property="og:description" content="{escape(meta_desc)}">
-  <meta property="og:image" content="{escape(dest.get('image', ''))}">
+  <meta property="og:image" content="{escape(post_og_img)}">
   <meta property="og:url" content="{escape(canonical)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{escape(seo_title)}">
+  <meta name="twitter:description" content="{escape(meta_desc)}">
+  <meta name="twitter:image" content="{escape(post_og_img)}">
   <script type="application/ld+json">{json.dumps(json_ld, ensure_ascii=False)}</script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
@@ -926,7 +975,10 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 </head>
 <body>
   <header class="top-nav">
-    <a href="{SITE_BASE_URL}/index.html" style="font-size:17px; color:#ffffff;">🐢 WizzTour Slow <span style="font-size:12.5px; color:#99f6e4; font-weight:500;">| 무장애·효도·유모차 평지 여행 가이드</span></a>
+    <a href="{SITE_BASE_URL}/index.html" style="font-size:17px; color:#ffffff; display:inline-flex; align-items:center; gap:8px;">
+      <img src="/assets/brand-circle.png" alt="WizzTour Slow" width="28" height="28" style="border-radius:50%; display:block;">
+      <span>WizzTour Slow <span style="font-size:12.5px; color:#99f6e4; font-weight:500;">| 무장애·효도·유모차 평지 여행 가이드</span></span>
+    </a>
     <div style="display:flex; gap:14px;">
       <a href="{SITE_BASE_URL}/index.html">전체 무장애 코스</a>
       <a href="https://www.wizztour.com" target="_blank" rel="noopener">전국 축제 메인</a>
@@ -950,6 +1002,8 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
         {escape(meta_desc)}
       </div>
 
+{ad_top_html}
+
       <img src="{escape(dest.get('image', ''))}" alt="{escape(title)} 무장애 평지 산책로" style="width:100%; max-height:420px; object-fit:cover; border-radius:14px; margin-bottom:20px;">
 
       <!-- [STEP 6 - 1차 링크 배치: 선택 이유 직후 무장애 숙소 & 지도 빠른 확인 CTA] -->
@@ -972,6 +1026,8 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
 
       <!-- 평지 산책 코스 -->
       {flat_route_html}
+
+{ad_mid_html}
 
       <!-- [STEP 3 & STEP 6 - 2차 링크 배치: 무장애·효도 호텔 3단 비교표] -->
       {hotel_table_html}
@@ -1021,6 +1077,8 @@ def build_post_page_html(dest: dict, check_date_str: str) -> str:
           <a href="https://en.wizztour.com" target="_blank" rel="noopener" style="background:#4f46e5; color:#fff !important; padding:10px 16px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700;">🌐 English Korea Guide (en.wizztour.com)</a>
         </div>
       </div>
+
+{ad_bottom_html}
     </article>
   </main>
 </body>
@@ -1057,24 +1115,45 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
         </article>
         """.strip()
 
+    common_head = make_common_head_meta()
+    ad_top_html = make_adsense_unit_html(AD_SLOT_TOP, "slow 상단")
+    ad_mid_html = make_adsense_unit_html(AD_SLOT_MID, "slow 중간")
+    ad_bottom_html = make_adsense_unit_html(AD_SLOT_BOTTOM, "slow 하단")
+    idx_title = "WizzTour Slow (slow.wizztour.com) | 계단·턱 없는 무장애·부모님 효도·유모차 평지 여행 &amp; 편안한 숙소 가이드"
+    idx_desc = "한국관광공사 열린관광(KorWithService1) &amp; 빅데이터 혼잡도 예측 연동! 휠체어 이용자, 무릎 약한 부모님 효도여행, 유모차 나들이를 위한 계단 없는 평지 산책 코스와 엘리베이터·장애인객실 호텔 비교 포털."
+    idx_og_img = f"{SITE_BASE_URL}/assets/og-image.jpg"
+
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WizzTour Slow (slow.wizztour.com) | 계단·턱 없는 무장애·부모님 효도·유모차 평지 여행 &amp; 편안한 숙소 가이드</title>
-  <meta name="description" content="한국관광공사 열린관광(KorWithService1) & 빅데이터 혼잡도 예측 연동! 휠체어 이용자, 무릎 약한 부모님 효도여행, 유모차 나들이를 위한 계단 없는 평지 산책 코스와 엘리베이터·장애인객실 호텔 비교 포털.">
+  <title>{idx_title}</title>
+  <meta name="description" content="{idx_desc}">
+{common_head}
   <link rel="canonical" href="{SITE_BASE_URL}/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WizzTour Slow">
+  <meta property="og:title" content="{idx_title}">
+  <meta property="og:description" content="{idx_desc}">
+  <meta property="og:url" content="{SITE_BASE_URL}/">
+  <meta property="og:image" content="{idx_og_img}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{idx_title}">
+  <meta name="twitter:description" content="{idx_desc}">
+  <meta name="twitter:image" content="{idx_og_img}">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     body {{ margin:0; font-family:'Noto Sans KR', sans-serif; background:#f8fafc; color:#0f172a; }}
-    .hero {{ background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:48px 20px 40px; text-align:center; }}
+    .hero {{ background:linear-gradient(135deg, #0f172a 0%, #134e4a 100%); color:#ffffff; padding:42px 20px 38px; text-align:center; }}
     .hero h1 {{ margin:10px 0 12px; font-size:30px; font-weight:800; line-height:1.35; }}
     .hero p {{ max-width:680px; margin:0 auto 22px; color:#ccfbf1; font-size:15px; line-height:1.65; }}
     .filter-bar {{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:760px; margin:0 auto; }}
     .filter-btn {{ background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:700; transition:0.2s; }}
     .filter-btn.active, .filter-btn:hover {{ background:#14b8a6; border-color:#14b8a6; color:#0f172a; }}
-    .container {{ max-width:1100px; margin:0 auto; padding:32px 18px 60px; }}
+    .container {{ max-width:1100px; margin:0 auto; padding:26px 18px 60px; }}
     .grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(310px, 1fr)); gap:20px; }}
     .spot-card {{ background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(15,23,42,0.05); transition:transform 0.2s; }}
     .spot-card:hover {{ transform:translateY(-4px); }}
@@ -1082,6 +1161,9 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
 </head>
 <body>
   <section class="hero">
+    <div style="margin:0 auto 14px; width:76px; height:76px; border-radius:50%; padding:3px; background:rgba(255,255,255,0.92); box-shadow:0 8px 24px rgba(0,0,0,0.28);">
+      <img src="/assets/brand-circle.png" alt="WizzTour Slow Logo" width="70" height="70" style="display:block; width:100%; height:100%; border-radius:50%;">
+    </div>
     <span style="background:#14b8a6; color:#0f172a; font-size:12px; font-weight:800; padding:4px 12px; border-radius:999px;">
       ♿ 한국관광공사 무장애 관광(KorWithService1) · 빅데이터 혼잡도 공식 연동
     </span>
@@ -1100,6 +1182,7 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
   </section>
 
   <main class="container">
+{ad_top_html}
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
       <h2 style="margin:0; font-size:21px; font-weight:800;">✨ 전국 검증된 무장애·효도·유모차 평지 여행 코스</h2>
       <span style="font-size:13px; color:#64748b;">최종 업데이트: {escape(check_date_str)}</span>
@@ -1108,7 +1191,9 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
       {cards}
     </div>
 
-    <div style="margin-top:42px; padding:24px; background:#0f172a; color:#ffffff; border-radius:18px; text-align:center;">
+{ad_mid_html}
+
+    <div style="margin-top:32px; padding:24px; background:#0f172a; color:#ffffff; border-radius:18px; text-align:center;">
       <h3 style="margin:0 0 8px 0; font-size:19px; color:#5eead4;">🗺️ WizzTour 4대 여행 생태계 바로가기</h3>
       <p style="margin:0 0 16px 0; font-size:14px; color:#cbd5e1;">목적에 맞는 WizzTour 전문 가이드에서 맞춤형 코스와 숙소 혜택을 확인하세요.</p>
       <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
@@ -1117,6 +1202,8 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
         <a href="https://en.wizztour.com" target="_blank" rel="noopener" style="background:#3b82f6; color:#fff; padding:10px 18px; border-radius:999px; text-decoration:none; font-size:13.5px; font-weight:700;">🌐 English Korea Guide (en.wizztour.com)</a>
       </div>
     </div>
+
+{ad_bottom_html}
   </main>
 
   <script>
@@ -1135,16 +1222,29 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
 
 
 def build_seo_assets(destinations: list):
-    now_iso = datetime.now(KST).strftime("%Y-%m-%d")
-    urls = [f"  <url><loc>{SITE_BASE_URL}/</loc><lastmod>{now_iso}</lastmod><priority>1.0</priority></url>"]
+    now_dt = datetime.now(KST)
+    now_iso = now_dt.strftime("%Y-%m-%d")
+    now_lastmod = now_dt.strftime("%Y-%m-%dT%H:%M:%S+09:00")
+    now_rfc822 = format_datetime(now_dt)
+
+    urls = [
+        f"  <url>\n    <loc>{SITE_BASE_URL}/</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>"
+    ]
     rss_items = []
 
-    for d in destinations:
+    for idx, d in enumerate(destinations):
         loc = f"{SITE_BASE_URL}/posts/{d['slug']}.html"
-        urls.append(f"  <url><loc>{escape(loc)}</loc><lastmod>{now_iso}</lastmod><priority>0.9</priority></url>")
+        urls.append(
+            f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{now_lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>"
+        )
+        item_pub = format_datetime(now_dt - timedelta(hours=idx))
+        cat_text = f"{d.get('province', '전국')} {d.get('city', '')}".strip()
         rss_items.append(f"""    <item>
       <title>{escape(d['title'])} 무장애·효도·유모차 평지 코스 &amp; 호텔 비교</title>
       <link>{escape(loc)}</link>
+      <guid isPermaLink="true">{escape(loc)}</guid>
+      <pubDate>{item_pub}</pubDate>
+      <category>{escape(cat_text)}</category>
       <description>{escape(d['overview'])}</description>
     </item>""")
 
@@ -1154,16 +1254,30 @@ def build_seo_assets(destinations: list):
 </urlset>
 """
     rss_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WizzTour Slow | 무장애·효도·유모차 평지 여행 가이드</title>
     <link>{SITE_BASE_URL}/</link>
     <description>계단 걱정 없는 휠체어·부모님 효도·유모차 평지 산책 코스 및 무장애 호텔 비교</description>
+    <language>ko</language>
+    <lastBuildDate>{now_rfc822}</lastBuildDate>
+    <atom:link href="{SITE_BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />
+    <image>
+      <url>{SITE_BASE_URL}/assets/brand-circle.png</url>
+      <title>WizzTour Slow</title>
+      <link>{SITE_BASE_URL}/</link>
+    </image>
 {chr(10).join(rss_items)}
   </channel>
 </rss>
 """
-    robots_txt = f"User-agent: *\nAllow: /\nSitemap: {SITE_BASE_URL}/sitemap.xml\n"
+    robots_txt = (
+        f"User-agent: *\n"
+        f"Allow: /\n"
+        f"Sitemap: {SITE_BASE_URL}/sitemap.xml\n"
+        f"{DAUM_WEBMASTER_PIN}\n"
+    )
+    ads_txt = "google.com, pub-9640565499370684, DIRECT, f08c47fec0942fa0\n"
 
     with open(os.path.join(BASE_DIR, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write(sitemap_xml)
@@ -1171,6 +1285,8 @@ def build_seo_assets(destinations: list):
         f.write(rss_xml)
     with open(os.path.join(BASE_DIR, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(robots_txt)
+    with open(os.path.join(BASE_DIR, "ads.txt"), "w", encoding="utf-8") as f:
+        f.write(ads_txt)
     with open(os.path.join(BASE_DIR, "CNAME"), "w", encoding="utf-8") as f:
         f.write("slow.wizztour.com\n")
     with open(os.path.join(BASE_DIR, "wizztourindexnow2026key99a8b7c6.txt"), "w", encoding="utf-8") as f:
