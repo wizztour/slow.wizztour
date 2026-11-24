@@ -959,7 +959,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
             체크인 날짜별 잔여 객실 · 조식 포함 · 무료취소 기한 사전 확인 권장
           </td>
           <td style="padding:11px 12px; border:1px solid #e2e8f0; text-align:center;">
-            <a href="{escape(row_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+            <a href="{escape(row_url)}" target="_blank" rel="nofollow sponsored noopener"
                style="display:inline-block; background:{color}; color:#ffffff !important; font-weight:700; font-size:12.5px; padding:8px 12px; border-radius:8px; text-decoration:none;">
               {escape(b_label)} →
             </a>
@@ -986,7 +986,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
           <div style="padding:11px 12px; display:flex; flex-direction:column; gap:5px; flex:1;">
             <span style="font-size:11px; color:#0f766e; font-weight:800;">📍 {escape(hc_addr[:26])}</span>
             <div style="font-size:14.5px; font-weight:800; color:#0f172a; line-height:1.35;">{escape(hc_title)}</div>
-            <a href="{escape(hc_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+            <a href="{escape(hc_url)}" target="_blank" rel="nofollow sponsored noopener"
                style="margin-top:auto; display:block; text-align:center; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:12.5px; padding:8px 10px; border-radius:8px; text-decoration:none;">
               🏨 객실·최저가 확인 →
             </a>
@@ -1047,7 +1047,7 @@ def make_slow_hotel_comparison_html(title: str, city: str, hotels: list, check_d
   </div>
 
   <div style="text-align:center;">
-    <a href="{escape(tripcom_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+    <a href="{escape(tripcom_url)}" target="_blank" rel="nofollow sponsored noopener"
        style="display:inline-block; background:linear-gradient(135deg, #0f766e 0%, #0d9488 100%); color:#ffffff !important; font-size:15.5px; font-weight:800; padding:13px 28px; border-radius:999px; text-decoration:none; box-shadow:0 4px 14px rgba(15,118,110,0.3);">
       👉 [{escape(subarea_label or city)}] 무장애·효도 호텔 객실 요금 전체 비교하기
     </a>
@@ -1141,15 +1141,15 @@ def make_usim_and_tour_affiliate_box_html(city: str) -> str:
     <strong>{escape(city)}</strong> 현장 매표소에서 휠체어나 유모차를 끌고 줄 서지 않도록 <strong>모바일 입장권·케이블카 패스</strong>를 미리 준비하시고, 접이식 휠체어·유모차가 넉넉히 실리는 <strong>SUV·카니발 렌트카</strong>와 <strong>KTX 휠체어석·가족석</strong> 예매를 한 번에 확인하세요.
   </p>
   <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
-    <a href="{escape(tour_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+    <a href="{escape(tour_url)}" target="_blank" rel="nofollow sponsored noopener"
        style="text-align:center; background:#4f46e5; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
       🎟️ [{escape(city)}] 줄 서지 않는 모바일 입장권·패스 할인 예매
     </a>
-    <a href="{escape(KLOOK_CAR_RENTAL_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+    <a href="{escape(KLOOK_CAR_RENTAL_URL)}" target="_blank" rel="nofollow sponsored noopener"
        style="text-align:center; background:#047857; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
       🚐 휠체어·유모차 넉넉한 SUV/카니발 렌트카 최저가 비교
     </a>
-    <a href="{escape(TRIPCOM_KTX_TRAIN_URL)}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+    <a href="{escape(TRIPCOM_KTX_TRAIN_URL)}" target="_blank" rel="nofollow sponsored noopener"
        style="text-align:center; background:#1e40af; color:#ffffff !important; font-weight:800; font-size:13.5px; padding:11px 14px; border-radius:10px; text-decoration:none;">
       🚄 부모님 효도·휠체어석 KTX 기차표 예매 (트립닷컴)
     </a>
@@ -1328,7 +1328,7 @@ def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
             rocket_badge = '<span style="background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:1px 6px; border-radius:4px;">로켓배송</span> ' if api_item.get("isRocket") else ""
             price_txt = f'<div style="font-size:13px; font-weight:800; color:#dc2626;">{rocket_badge}{p_price:,}원</div>' if p_price > 0 else ""
             btns_html += (
-                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
+                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener" '
                 f'style="display:flex; align-items:center; gap:10px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:8px 10px; text-decoration:none; color:#0f172a;">'
                 f'<img src="{escape(p_img)}" alt="{escape(kw)}" loading="lazy" style="width:54px; height:54px; object-fit:cover; border-radius:8px; flex-shrink:0; border:1px solid #f1f5f9;">'
                 f'<div style="min-width:0; flex:1;">'
@@ -1340,7 +1340,7 @@ def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
             )
         else:
             btns_html += (
-                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener noreferrer" '
+                f'<a href="{escape(p_url)}" target="_blank" rel="nofollow sponsored noopener" '
                 f'style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #fdba74; border-radius:10px; padding:10px 14px; text-decoration:none; color:#0f172a; font-weight:800; font-size:13.5px;">'
                 f'<span>{label}</span>'
                 f'<span style="background:{color}; color:#ffffff; font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;">최저가 보기 →</span>'
@@ -1351,7 +1351,7 @@ def make_coupang_care_box_html(dest: dict, bf: dict) -> str:
 <section id="coupang-care-gear" style="margin:16px 0 20px 0; padding:12px 14px; background:#fff7ed; border:1px solid #fdba74; border-radius:12px;">
   <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 10px; margin-bottom:10px;">
     <span style="font-size:13.5px; font-weight:800; color:#9a3412;">🛒 출발 전 챙기면 좋은 무장애·가족 준비물</span>
-    <span style="font-size:11.5px; color:#9a3412;">※ 쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</span>
+    <span style="font-size:11.5px; color:#9a3412;">※ 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
   </div>
   <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px;">
     {btns_html}
@@ -1600,7 +1600,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
         <p style="margin:0 0 10px 0; font-size:14.5px; color:#134e4a; font-weight:700;">
           💡 {escape(city)} 방문 날, 엘리베이터·장애인객실·1층 조식이 갖춰진 숙소가 남아 있는지 먼저 확인해 보세요!
         </p>
-        <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+        <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener"
            style="display:inline-block; background:#0f766e; color:#ffffff !important; font-weight:800; font-size:14.5px; padding:11px 22px; border-radius:999px; text-decoration:none;">
           🏨 [{escape(city)}] 무장애·부모님 효도 호텔 객실 조건 확인하고 예약하기
         </a>
@@ -1641,7 +1641,7 @@ def build_post_page_html(dest: dict, check_date_str: str, all_destinations: list
           <li>☑️ <strong>현장 대여 &amp; 상비약</strong>: 복지카드(장애인 주차·할인용), 부모님 상비약, 현장 휠체어·유모차 대여소 위치(주출입구 안내소) 체크</li>
         </ul>
         <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-          <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener noreferrer"
+          <a href="{tripcom_url}" target="_blank" rel="nofollow sponsored noopener"
              style="display:inline-block; background:#ea580c; color:#fff !important; font-weight:800; font-size:14px; padding:11px 22px; border-radius:999px; text-decoration:none;">
             🏨 [{escape(city)}] 무료취소 가능 무장애·효도 숙소 예약하기
           </a>
@@ -1774,10 +1774,10 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
     <p style="margin:0 0 18px 0; color:#475569; font-size:14.5px;">한국관광공사 KorWithService2 공식 데이터 기반 · 최종 확인일: {escape(check_date_str)}</p>
 {ad_top_html}
     <div style="background:#fff7ed; border:1px solid #fdba74; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
-      <span style="font-size:13.5px; font-weight:700; color:#9a3412;">📢 쿠팡 파트너스 활동으로 수수료를 제공받습니다. 출발 전 휠체어·효도 준비물을 점검하세요:</span>
+      <span style="font-size:13px; font-weight:700; color:#9a3412;">📢 ※ 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <a href="{escape(coupang_wheel)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#0f766e; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">접이식 휴대용 휠체어 최저가</a>
-        <a href="{escape(coupang_chair)}" target="_blank" rel="nofollow sponsored noopener noreferrer" style="background:#ea580c; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">지팡이 휴대의자 보기</a>
+        <a href="{escape(coupang_wheel)}" target="_blank" rel="nofollow sponsored noopener" style="background:#0f766e; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">접이식 휴대용 휠체어 최저가</a>
+        <a href="{escape(coupang_chair)}" target="_blank" rel="nofollow sponsored noopener" style="background:#ea580c; color:#fff; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:800; text-decoration:none;">지팡이 휴대의자 보기</a>
       </div>
     </div>
     <p class="mobile-scroll-hint">↔ 표를 좌우로 밀어서 전체 무장애 항목을 확인하세요</p>
