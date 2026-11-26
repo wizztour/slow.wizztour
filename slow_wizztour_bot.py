@@ -1880,6 +1880,7 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
   <meta name="twitter:title" content="{idx_title}">
   <meta name="twitter:description" content="{idx_desc}">
   <meta name="twitter:image" content="{idx_og_img}">
+  <script type="application/ld+json">{json.dumps({{"@context": "https://schema.org", "@graph": [{{"@type": "WebSite", "name": "WizzTour Slow", "url": f"{{SITE_BASE_URL}}/", "description": idx_desc}}, {{"@type": "CollectionPage", "name": idx_title, "url": f"{{SITE_BASE_URL}}/", "inLanguage": "ko"}}]}}, ensure_ascii=False)}</script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
 {make_common_responsive_css()}
