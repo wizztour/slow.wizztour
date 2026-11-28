@@ -638,7 +638,7 @@ VERIFIED_BARRIER_FREE_DESTINATIONS = [
 
 
 def fetch_kto_barrier_free_detail(content_id: str) -> dict:
-    """한국관광공사 KorWithService2/detailWithTour2 실시간 조회 (키 설정 시 병합)"""
+    """공식 관광 안내 정보/detailWithTour2 실시간 조회 (키 설정 시 병합)"""
     if not content_id or not SERVICE_KEY:
         return {}
     url = "https://apis.data.go.kr/B551011/KorWithService2/detailWithTour2"
@@ -1777,7 +1777,7 @@ def build_region_hub_html(province: str, spots: list, check_date_str: str) -> st
   </header>
   <main class="container">
     <h1 style="font-size:26px; margin:0 0 8px 0; font-weight:800;">📍 {escape(province)} 무장애·효도·유모차 여행지 ({len(spots)}곳) 전체 조회표</h1>
-    <p style="margin:0 0 18px 0; color:#475569; font-size:14.5px;">한국관광공사 KorWithService2 공식 데이터 기반 · 최종 확인일: {escape(check_date_str)}</p>
+    <p style="margin:0 0 18px 0; color:#475569; font-size:14.5px;">공식 관광 안내 정보 공식 데이터 기반 · 최종 확인일: {escape(check_date_str)}</p>
 {ad_top_html}
     <div style="background:#fff7ed; border:1px solid #fdba74; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
       <span style="font-size:13px; font-weight:700; color:#9a3412;">📢 ※ 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
@@ -1911,7 +1911,7 @@ def build_index_html(destinations: list, check_date_str: str) -> str:
       <img src="/assets/brand-circle.png" alt="WizzTour Slow Logo" width="70" height="70" style="display:block; width:100%; height:100%; border-radius:50%;">
     </div>
     <span style="background:#14b8a6; color:#0f172a; font-size:12px; font-weight:800; padding:4px 12px; border-radius:999px;">
-      ♿ 한국관광공사 KorWithService2 공식 연동 · 전국 {len(destinations)}곳 무장애 팩트 DB
+      ♿ 전국 무장애 여행지 공식 검증 정보 · 전국 {len(destinations)}곳 무장애 여행 가이드
     </span>
     <h1>전국 무장애 · 효도 · 유모차 여행지 {len(destinations)}곳 1초 조회</h1>
     <p>
@@ -2283,7 +2283,7 @@ def _build_discovered_spot_entry(it: dict, ctid: str, bf: dict, now_iso: str, ch
 def discover_new_kto_barrier_free_spots(existing_ids: set, now_iso: str = None, check_date_str: str = None, limit: int = 2) -> list:
     """
     [매일 최대 N건 자동 신규 발굴 엔진 - KorWithService2]
-    한국관광공사 KorWithService2(숙박 32 우선 가중치 / 관광지 12 / 문화시설 14)를 조회하여
+    공식 관광 안내 정보(숙박 32 우선 가중치 / 관광지 12 / 문화시설 14)를 조회하여
     아직 발행되지 않은 전국 무장애 명소·숙소를 자동으로 발굴합니다.
     """
     if not SERVICE_KEY:
